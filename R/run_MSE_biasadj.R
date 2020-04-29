@@ -1,76 +1,48 @@
-library(TMB)
-compile("src/runHakeassessment.cpp")
-dyn.load(dynlib("src/runHakeassessment"))
+library(PacifichakeMSE)
+library(purrr)
+library(here)
 library(r4ss)
-mod <- SS_output(system.file("SS32018"), printstats=FALSE, verbose = FALSE) # Read the true selectivity
+.seed <- 12345
+results_dir <- "bias_adjustment"
 
-# Set the seed
-seedz <- 12345
-set.seed(seedz)
+mod <- SS_output(system.file("extdata/SS32018/",
+                             package = "PacifichakeMSE",
+                             mustWork = TRUE),
+                 printstats = FALSE,
+                 verbose = FALSE)
 
-nruns <- 1000
+simyears <- 3
+nruns <- 2
 seeds <- floor(runif(n = nruns, min = 1, max = 1e6))
-
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-df <- load_data_seasons(nseason = 4, nspace = 2) # Prepare data for operating model
-df$bfuture <- 0
-
-
-for (i in 1:nruns){
-  tmp <- run_multiple_OMs(simyears = 50, seeds[i], df =df, Catchin =0)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-
+fns <- c("MSErun_move_nofishing_nobiasadj.rds",
+         "MSErun_move_nofishing_biasadj.rds",
+         "MSErun_move_nofishing_biasadj_med.rds")
+if(!dir.exists(here("results"))){
+  dir.create(here("results"))
 }
-# # # #
-save(ls.save,file = 'results/bias adjustment/MSErun_move_nofishing_nobiasadj.Rdata')
-
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-df <- load_data_seasons(nseason = 4, nspace = 2, bfuture = 0.87) # Prepare data for operating model
-
-for (i in 1:nruns){
-  tmp <- run_multiple_OMs(simyears = 50, seeds[i], df =df, Catchin =0)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-
+if(!dir.exists(here("results", results_dir))){
+  dir.create(here("results", results_dir))
 }
-# # # #
-save(ls.save,file = 'results/bias adjustment/MSErun_move_nofishing_biasadj.Rdata')
 
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-df <- load_data_seasons(nseason = 4, nspace = 2, bfuture = 0.5) # Prepare data for operating model
+# Prepare data for operating model
+dfs <- list()
+dfs[[1]] <- load_data_seasons(nseason = 4,
+                              nspace = 2)
+dfs[[2]] <- load_data_seasons(nseason = 4,
+                              nspace = 2,
+                              bfuture = 0.87)
+dfs[[3]] <- load_data_seasons(nseason = 4,
+                              nspace = 2,
+                              bfuture = 0.5)
 
-
-for (i in 1:nruns){
-  tmp <- run_multiple_OMs(simyears = 50, seeds[i], df =df, Catchin =0)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-
-}
-# # # #
-save(ls.save,file = 'results/bias adjustment/MSErun_move_nofishing_biasadj_med.Rdata')
-
+# Loop MSEs with different errors in future survey and recruitment
+map2(fns, dfs, ~{
+  ls_save <- map(1:nruns, function(run = .x, ...){
+    tmp <- run_multiple_OMs(simyears = simyears,
+                            seed = seeds[run],
+                            df = .y,
+                            Catchin = 0)
+    ifelse(is.list(tmp), tmp, NA)
+  }, ...)
+  saveRDS(ls_save, file = here("results", results_dir, .x))
+})
