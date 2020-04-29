@@ -1,4 +1,6 @@
 library(PacifichakeMSE)
+library(purrr)
+library(here)
 library(r4ss)
 .seed <- 12345
 
@@ -18,7 +20,7 @@ parms.true <- getParameters_OM(TRUE, mod, df)
 
 time <- 1
 yrinit <- df$nyear
-nruns <- 100
+nruns <- 2
 seeds <- floor(runif(n = nruns, min = 1, max = 1e6))
 simyears <- 3 # Project this many years into the future
 yrs <- df$years
@@ -29,95 +31,27 @@ N0 <- NA
 # Run the operating model until last_yr
 sim.data <- run.agebased.true.catch(df, .seed)
 
+# MSE TAC types for the function run_multiple_MSEs()
+fns <- c("MSE_A_HCR.rds",
+         "MSE_B_JMC.rds",
+         "MSE_C_realized.rds",
+         "MSE_D_Floor50.rds")
+tacs <- 1:length(fns)
+if(!dir.exists(here("results"))){
+  dir.create(here("results"))
+}
+if(!dir.exists(here("results", "HCR"))){
+  dir.create(here("results", "HCR"))
+}
+
 # Loop MSEs with different errors in future survey and recruitment
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-for(i in 1:nruns){
-  tmp <- run_multiple_MSEs(simyears = simyears,
-                           seeds = seeds[i],
-                           TAC = 1,
-                           df = df)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-}
-# # # #
-save(ls.save,file = 'results/HCR/MSE_A_HCR.Rdata')
-
-# ### Loop MSE's with different errors in future survey and recruitment
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-#
-for (i in 1:nruns){
-  tmp <- run_multiple_MSEs(simyears = simyears, seeds[i],
-                           TAC = 2, df =df)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-
-
-}
-# # # #
-save(ls.save,file = 'results/HCR/MSE_B_JMC.Rdata')
-
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-
-for (i in 1:nruns){
-  tmp <- run_multiple_MSEs(simyears = simyears, seeds[i],
-                           TAC = 3, df =df)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-
-
-
-}
-# # # #
-save(ls.save,file = 'results/HCR/MSE_C_realized.Rdata')
-
-
-ls.save <- list()
-ls.converge <- matrix(0, nruns)
-
-for (i in 1:nruns){
-  tmp <- run_multiple_MSEs(simyears = simyears, seeds[i],
-                           TAC = 4, df =df)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  print(i)
-  #tmp <- run_multiple_MSEs(simyears = 30, seeds[i])
-  if(is.list(tmp)){
-    ls.save[[i]] <-tmp
-    ls.converge[i] <- 1
-  }else{
-    ls.save[[i]] <- NA
-    ls.converge[i] <- 0
-  }
-
-
-
-}
-# # # #
-save(ls.save,file = 'results/HCR/MSE_D_Floor50.Rdata')
-
-
+map2(fns, tacs, ~{
+  ls_save <- map2(.y, 1:nruns, ~{
+    tmp <- run_multiple_MSEs(simyears = simyears,
+                             seeds = seeds[.y],
+                             TAC = .x,
+                             df = df)
+    ifelse(is.list(tmp), tmp, NA)
+  })
+  saveRDS(ls_save, file = here("results", "HCR", .x))
+})
