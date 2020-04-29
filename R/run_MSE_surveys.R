@@ -22,7 +22,10 @@ df <- load_data_seasons(nseason = 4,
 parms.true <- getParameters_OM(TRUE, mod, df)
 
 seeds <- floor(runif(n = nruns, min = 1, max = 1e6))
-year.future <- c(df$years,(df$years[length(df$years)]+1):(df$years[length(df$years)]+simyears))
+yrs <- df$years
+first_sim_yr <- max(yrs) + 1
+last_sim_yr <- first_sim_yr + simyears - 1
+year.future <- c(yrs, first_sim_yr:last_sim_yr)
 
 sim.data <- run.agebased.true.catch(df) # Run the operating model until 2018
 
