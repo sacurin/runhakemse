@@ -4,6 +4,8 @@ library(here)
 library(r4ss)
 .seed <- 12345
 results_dir <- "HCR"
+nruns <- 2
+simyears <- 3
 
 mod <- SS_output(system.file("extdata/SS32018/",
                              package = "PacifichakeMSE",
@@ -19,16 +21,11 @@ df <- load_data_seasons(nseason = 4,
 # Load parameters from assessment
 parms.true <- getParameters_OM(TRUE, mod, df)
 
-time <- 1
-yrinit <- df$nyear
-nruns <- 2
 seeds <- floor(runif(n = nruns, min = 1, max = 1e6))
-simyears <- 3
 yrs <- df$years
 first_sim_yr <- max(yrs) + 1
 last_sim_yr <- first_sim_yr + simyears - 1
 year.future <- c(yrs, first_sim_yr:last_sim_yr)
-N0 <- NA
 # Run the operating model until last_yr
 sim.data <- run.agebased.true.catch(df, .seed)
 
@@ -45,7 +42,7 @@ if(!dir.exists(here("results", results_dir))){
   dir.create(here("results", results_dir))
 }
 
-# Loop MSEs with different errors in future survey and recruitment
+# Loop MSEs
 map2(fns, tacs, ~{
   ls_save <- map(1:nruns, function(run = .x, ...){
     tmp <- run_multiple_MSEs(simyears = simyears,

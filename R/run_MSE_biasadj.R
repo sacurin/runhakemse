@@ -4,6 +4,8 @@ library(here)
 library(r4ss)
 .seed <- 12345
 results_dir <- "bias_adjustment"
+nruns <- 2
+simyears <- 3
 
 mod <- SS_output(system.file("extdata/SS32018/",
                              package = "PacifichakeMSE",
@@ -11,8 +13,6 @@ mod <- SS_output(system.file("extdata/SS32018/",
                  printstats = FALSE,
                  verbose = FALSE)
 
-simyears <- 3
-nruns <- 2
 seeds <- floor(runif(n = nruns, min = 1, max = 1e6))
 fns <- c("MSErun_move_nofishing_nobiasadj.rds",
          "MSErun_move_nofishing_biasadj.rds",
