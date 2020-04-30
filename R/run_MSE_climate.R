@@ -1,70 +1,33 @@
 library(PacifichakeMSE)
-library(purrr)
-library(here)
-library(r4ss)
-.seed <- 12345
-results_dir <- "climate"
-nruns <- 3
-simyears <- 3
 
-mod <- SS_output(system.file("extdata/SS32018/",
-                             package = "PacifichakeMSE",
-                             mustWork = TRUE),
-                 printstats = FALSE,
-                 verbose = FALSE)
+fns = c("MSErun_move_JMC_climate_0_04_HYBR_TAC1",
+        "MSErun_move_JMC_climate_0_HYBR_TAC3",
+        "MSErun_move_JMC_climate_0_02_HYBR_TAC3",
+        "MSErun_move_JMC_climate_0_04_HYBR_TAC3")
 
-# Prepare data for operating model
-df <- load_data_seasons(nseason = 4,
-                        nspace = 2,
-                        bfuture = 0.5)
-
-# Load parameters from assessment
-parms.true <- getParameters_OM(TRUE, mod, df)
-
-seeds <- floor(runif(n = nruns, min = 1, max = 1e6))
-yrs <- df$years
-first_sim_yr <- max(yrs) + 1
-last_sim_yr <- first_sim_yr + simyears - 1
-year.future <- c(yrs, first_sim_yr:last_sim_yr)
-
-# Run the operating model until last_yr
-sim.data <- run.agebased.true.catch(df, .seed)
-
-fns <- c("MSErun_move_JMC_climate_0_04_HYBR_TAC1.rds",
-         "MSErun_move_JMC_climate_0_HYBR_TAC3.rds",
-         "MSErun_move_JMC_climate_0_02_HYBR_TAC3.rds",
-         "MSErun_move_JMC_climate_0_04_HYBR_TAC3.rds")
-vals <- list(tacs = c(1, 3, 3, 3),
-             cincreases = c(0.04, 0.0, 0.02, 0.04),
-             mincreases = c(0.02, 0.0, 0.005, 0.02))
-len <- 1:length(fns)
-if(!dir.exists(here("results"))){
-  dir.create(here("results"))
-}
-if(!dir.exists(here("results", results_dir))){
-  dir.create(here("results", results_dir))
-}
-
-# Loop MSEs
-map2(fns, len, ~{
-  ls_save <- map(1:nruns, function(run = .x, ...){
-    tmp <- run_multiple_MSEs(simyears = simyears,
-                             seeds = seeds[run],
-                             TAC = vals$tacs[.y],
-                             df = df,
-                             cincrease = vals$cincreases[.y],
-                             mincrease = vals$mincreases[.y])
-    if(is.list(tmp)) tmp else NA
-  }, ...)
-  saveRDS(ls_save, file = here("results", results_dir, .x))
-})
+run_mse_climate(ss_extdata_dir = "SS32018",
+                nruns = 2,
+                simyears = 3,
+                fns = fns,
+                tacs = c(1, 3, 3, 3),
+                cincreases = c(0.04, 0.0, 0.02, 0.04),
+                mincreases = c(0.02, 0.0, 0.005, 0.02),
+                om_params_seed = 12345,
+                results_root_dir = "results",
+                results_dir = "climate",
+                nseason = 4,
+                nspace = 2,
+                bfuture = 0.5)
 
 # Make the plots - see plotClimateMSEs.R
 fns <- fns[-1]
+fns <- purrr::map_chr(fns, ~{
+  ifelse(stringr::str_ends(.x, pattern = "\\.rds"), .x, paste0(.x, ".rds"))
+})
 legend <- c("base model", "medium change", "high change")
 out <- map(fns, ~{
-  readRDS(here("results", results_dir, .x))
+  readRDS(here::here("results", results_dir, .x))
 })
 
 names(out) <- legend
-fn_plot_MSE(out, sim.data, plotfolder = here("results", results_dir), plotexp = TRUE)
+fn_plot_MSE(out, sim.data, plotfolder = here::here("results", results_dir), plotexp = TRUE)
