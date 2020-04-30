@@ -60,7 +60,7 @@ map2(fns, dfs, ~{
                              seeds = seeds[run],
                              TAC = 2,
                              df = .y)
-    ifelse(is.list(tmp), tmp, NA)
+    if(is.list(tmp)) tmp else NA
   }, ...)
   saveRDS(ls_save, file = here("results", results_dir, .x))
 })

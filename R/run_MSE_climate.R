@@ -4,7 +4,7 @@ library(here)
 library(r4ss)
 .seed <- 12345
 results_dir <- "climate"
-nruns <- 2
+nruns <- 3
 simyears <- 3
 
 mod <- SS_output(system.file("extdata/SS32018/",
@@ -54,8 +54,17 @@ map2(fns, len, ~{
                              df = df,
                              cincrease = vals$cincreases[.y],
                              mincrease = vals$mincreases[.y])
-    ifelse(is.list(tmp), tmp, NA)
+    if(is.list(tmp)) tmp else NA
   }, ...)
   saveRDS(ls_save, file = here("results", results_dir, .x))
 })
 
+# Make the plots - see plotClimateMSEs.R
+fns <- fns[-1]
+legend <- c("base model", "medium change", "high change")
+out <- map(fns, ~{
+  readRDS(here("results", results_dir, .x))
+})
+
+names(out) <- legend
+fn_plot_MSE(out, sim.data, plotfolder = here("results", results_dir), plotexp = TRUE)

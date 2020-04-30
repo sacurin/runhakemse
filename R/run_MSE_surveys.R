@@ -29,7 +29,6 @@ year.future <- c(yrs, first_sim_yr:last_sim_yr)
 
 sim.data <- run.agebased.true.catch(df) # Run the operating model until 2018
 
-# MSE TAC types for the function run_multiple_MSEs()
 fns <- c("MSE_Real_Survey1.rds",
          "MSE_Real_Survey2.rds",
          "MSE_Real_Survey3.rds")
@@ -52,7 +51,7 @@ map2(fns, dfs, ~{
                              seeds = seeds[run],
                              TAC = 1,
                              df = .y)
-    ifelse(is.list(tmp), tmp, NA)
+    if(is.list(tmp)) tmp else NA
   }, ...)
   saveRDS(ls_save, file = here("results", results_dir, .x))
 })

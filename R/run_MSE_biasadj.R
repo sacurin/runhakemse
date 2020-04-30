@@ -42,7 +42,7 @@ map2(fns, dfs, ~{
                             seed = seeds[run],
                             df = .y,
                             Catchin = 0)
-    ifelse(is.list(tmp), tmp, NA)
+    if(is.list(tmp)) tmp else NA
   }, ...)
   saveRDS(ls_save, file = here("results", results_dir, .x))
 })
