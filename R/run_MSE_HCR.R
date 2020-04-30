@@ -4,8 +4,8 @@ library(here)
 library(r4ss)
 .seed <- 12345
 results_dir <- "HCR"
-nruns <- 2
-simyears <- 3
+nruns <- 100
+simyears <- 30
 
 mod <- SS_output(system.file("extdata/SS32018/",
                              package = "PacifichakeMSE",
@@ -49,7 +49,7 @@ map2(fns, tacs, ~{
                              seeds = seeds[run],
                              TAC = .y,
                              df = df)
-    ifelse(is.list(tmp), tmp, NA)
+    if(is.list(tmp)) tmp else NA
   }, ...)
   saveRDS(ls_save, file = here("results", results_dir, .x))
 })
