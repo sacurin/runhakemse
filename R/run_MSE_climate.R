@@ -5,15 +5,20 @@ library(stringr)
 
 results_root_dir <- here("results")
 results_dir <- here("results", "climate")
-fns = c(#"MSErun_move_JMC_climate_0_04_HYBR_TAC1",
-        "MSErun_move_JMC_climate_0_HYBR_TAC3",
+
+fns = c("MSErun_move_JMC_climate_0_HYBR_TAC3",
         "MSErun_move_JMC_climate_0_02_HYBR_TAC3",
         "MSErun_move_JMC_climate_0_04_HYBR_TAC3")
+
+plotnames <-c("Base scenario",
+              "Medium increase",
+              "High increase")
 
 run_mses(ss_extdata_dir = "SS32018",
          nruns = 2,
          simyears = 3,
          fns = fns,
+         plotnames = plotnames,
          tacs = c(1, 3, 3, 3),
          cincreases = c(0.04, 0.0, 0.02, 0.04),
          mincreases = c(0.02, 0.0, 0.005, 0.02),

@@ -9,10 +9,15 @@ fns <- c("MSE_sel1.rds",
          "MSE_sel2.rds",
          "MSE_sel3.rds")
 
+plotnames <- c("Base scenario",
+               "US small \nselectivity",
+               "2018 selectivity")
+
 run_mses(ss_extdata_dir = "SS32018",
          nruns = 2,
          simyears = 3,
          fns = fns,
+         plotnames = plotnames,
          tacs = 2,
          cincreases = 0,
          mincreases = 0,

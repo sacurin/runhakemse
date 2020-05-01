@@ -5,14 +5,20 @@ library(stringr)
 
 results_root_dir <- here("results")
 results_dir <- here("results", "biasadjust")
+
 fns <- c("MSErun_move_nofishing_nobiasadj",
          "MSErun_move_nofishing_biasadj",
          "MSErun_move_nofishing_biasadj_med")
+
+plotnames <- c("0",
+               "0.87",
+               "0.5")
 
 run_mses(ss_extdata_dir = "SS32018",
          nruns = 2,
          simyears = 3,
          fns = fns,
+         plotnames = plotnames,
          om_params_seed = 12345,
          multiple_season_data = list(c(nseason = 4,
                                        nspace = 2,
