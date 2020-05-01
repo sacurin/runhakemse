@@ -1,33 +1,32 @@
-## Run the MSE plots
-
-# Plot CLIMATE STUFF
-results <- 'results/Climate/'
-plotnames <- c('base scenario','medium increase','high increase')
-#plotnames <-  factor(plotnames, levels = c('No change','Medium increase', 'High increase'))
-
-#plotnames <- c('1','2','3')
-plotMSE(results,plotnames = plotnames, plotexp = TRUE, pidx = c(1,2,3))
-
-# Plot HCR stuff
-results <- here::here("results/HCR")
-plotMSE(results, plotexp = TRUE, plotnames = c('base scenario','Historical TAC','Realized','Floor 50'))
-
-results <- 'results/survey/JMC/'
-plotMSE(results, plotexp = TRUE, plotnames = c('survey1','base scenario','survey3'), pidx = c(2,1,3))
-
-results <- 'results/survey/JTC/'
-plotMSE(results, plotexp = TRUE, plotnames = c('Base biennial','Annual','Triennial'))
-
-results <- 'results/survey/Realized/'
-plotMSE(results, plotexp = FALSE, plotnames = c('survey1','base scenario','survey3'))
+ps_climate <- setup_mse_plot_objects(results_dir = here::here("results/climate"),
+                                     plotexp = TRUE,
+                                     plotnames = c("base scenario",
+                                                   "medium increase",
+                                                   "high increase"))
 
 
-# Plot the bias adjustment (no fishing) runs
-results <- 'results/bias adjustment/'
-plotMSE_biasadjustment(results, plotnames = c('0.87','0.5','0'), plotexp = TRUE)
+ps_hcr <- setup_mse_plot_objects(results_dir = here::here("results/hcr"),
+                                 plotexp = TRUE,
+                                 plotnames = c("base scenario",
+                                               "Historical TAC",
+                                               "Realized",
+                                               "Floor 50"))
 
-# Plot HCR stuff
-results <- 'results/Selectivity/'
-plotnames <-  c('base scenario','US small \nselectivity','2018 selectivity')
-#plotnames <- c('1','2','3')
-plotMSE(results,plotnames = plotnames, plotexp = TRUE)
+ps_survey <- setup_mse_plot_objects(results_dir = here::here("results/hcr"),
+                                    plotexp = TRUE,
+                                    plotnames = c("survey1",
+                                                  "base scenario",
+                                                  "survey3"),
+                                    pidx = c(2, 1, 3))
+
+ps_biasadjust <- setup_mse_plot_objects(results_dir = here::here("results/hcr"),
+                                        plotexp = TRUE,
+                                        plotnames = c("0.87",
+                                                      "0.5",
+                                                      "0"))
+
+ps_selectivity <- setup_mse_plot_objects(results_dir = here::here("results/hcr"),
+                                         plotexp = TRUE,
+                                         plotnames = c("base scenario",
+                                                       "US small \nselectivity",
+                                                       "2018 selectivity"))

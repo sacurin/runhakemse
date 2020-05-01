@@ -5,7 +5,7 @@ library(stringr)
 
 results_root_dir <- here("results")
 results_dir <- here("results", "climate")
-fns = c("MSErun_move_JMC_climate_0_04_HYBR_TAC1",
+fns = c(#"MSErun_move_JMC_climate_0_04_HYBR_TAC1",
         "MSErun_move_JMC_climate_0_HYBR_TAC3",
         "MSErun_move_JMC_climate_0_02_HYBR_TAC3",
         "MSErun_move_JMC_climate_0_04_HYBR_TAC3")
