@@ -9,7 +9,7 @@ plotnames <- c('base scenario','medium increase','high increase')
 plotMSE(results,plotnames = plotnames, plotexp = TRUE, pidx = c(1,2,3))
 
 # Plot HCR stuff
-results <- 'results/HCR/'
+results <- here::here("results/HCR")
 plotMSE(results, plotexp = TRUE, plotnames = c('base scenario','Historical TAC','Realized','Floor 50'))
 
 results <- 'results/survey/JMC/'

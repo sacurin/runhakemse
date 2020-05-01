@@ -3,8 +3,8 @@ library(here)
 library(purrr)
 library(stringr)
 
-results_root_dir <- "results"
-results_dir <- "climate"
+results_root_dir <- here("results")
+results_dir <- here("results", "climate")
 fns = c("MSErun_move_JMC_climate_0_04_HYBR_TAC1",
         "MSErun_move_JMC_climate_0_HYBR_TAC3",
         "MSErun_move_JMC_climate_0_02_HYBR_TAC3",
@@ -37,4 +37,4 @@ names(out) <- c("base model", "medium change", "high change")
 df <- load_data_seasons(nseason = 4, nspace = 2, bfuture = 0.5)
 sim.data <- run.agebased.true.catch(df)
 # TODO: Fix this error
-fn_plot_MSE(out, sim.data, plotfolder = here(results_root_dir, results_dir), plotexp = TRUE)
+fn_plot_MSE(out, sim.data, plotfolder = results_dir, plotexp = TRUE)

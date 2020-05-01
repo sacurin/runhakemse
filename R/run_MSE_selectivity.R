@@ -3,8 +3,8 @@ library(dplyr)
 library(ggplot2)
 library(purrr)
 
-results_root_dir <- "results"
-results_dir <- "selectivity"
+results_root_dir <- here("results")
+results_dir <- here("results", "selectivity")
 fns <- c("MSE_sel1.rds",
          "MSE_sel2.rds",
          "MSE_sel3.rds")

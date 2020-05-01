@@ -3,8 +3,8 @@ library(here)
 library(purrr)
 library(stringr)
 
-results_root_dir <- "results"
-results_dir <- "biasadjust"
+results_root_dir <- here("results")
+results_dir <- here("results", "biasadjust")
 fns <- c("MSErun_move_nofishing_nobiasadj",
          "MSErun_move_nofishing_biasadj",
          "MSErun_move_nofishing_biasadj_med")
