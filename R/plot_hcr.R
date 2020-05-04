@@ -27,3 +27,5 @@ plot_aa(ps_hcr, type = "survey")
 plot_aa(ps_hcr, type = "catch")
 plot_aa_country(ps_hcr, type = "survey", country_colors = c("darkred", "blue4"))
 plot_aa_country(ps_hcr, type = "catch", country_colors = c("darkred", "blue4"))
+
+plot_standard_error(ps_hcr)
