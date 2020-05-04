@@ -27,5 +27,14 @@ plot_aa(ps_hcr, type = "survey")
 plot_aa(ps_hcr, type = "catch")
 plot_aa_country(ps_hcr, type = "survey", country_colors = c("darkred", "blue4"))
 plot_aa_country(ps_hcr, type = "catch", country_colors = c("darkred", "blue4"))
-
 plot_standard_error(ps_hcr)
+plot_exploitation_rate(ps_hcr) +
+  coord_cartesian(ylim = c(0.0, 1.0))
+plot_catch_quota(ps_hcr) +
+  coord_cartesian(ylim = c(0.8, 1.1))
+plot_catch_quota_1panel(ps_hcr) +
+  coord_cartesian(ylim = c(0.8, 1.1))
+plot_ssb_ssb0(ps_hcr) +
+  coord_cartesian(ylim = c(0.0, 2.0)) +
+  geom_ribbon(aes(ymin = p5, ymax = p95), linetype = 0)
+plot_catch_quota_1panel(ps_hcr)
