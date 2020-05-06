@@ -1,0 +1,477 @@
+---
+title: "PacifichakeMSE"
+author: "Nis S Jacobsen"
+date: "May 6, 2020"
+email: "nsja@aqua.dtu.dk"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE)
+```
+# Introduction
+
+This is a description of the **PacifichakeMSE** package to run management strategy evaluation of Pacific hake. The package sets up a set of parameters, and runs an operating model in R, and fits an estimation in TMB.
+The package runs on a range of dependencies, most notably TMB, which require a developer version of R. For more information see the [TMB on GitHub](https://github.com/kaskr/adcomp).
+
+To install the **PacifichakeMSE** package run
+```{r, eval = FALSE}
+devtools::install_github("https://github.com/cgrandin/PacifichakeMSE")
+```
+
+Load the dependencies
+```{r message=FALSE}
+library(PacifichakeMSE)
+library(r4ss)
+library(dplyr)
+library(ggplot2)
+library(reshape2)
+library(patchwork)
+```
+
+# Operating model
+
+First we can initialize the parameters of the operating model using the function `load_data_seasons()`
+
+```{r , echo = TRUE}
+df <- load_data_seasons(nseason = 4, 
+                        nspace = 2,
+                        logSDR = 1.4,
+                        moveslope = 0.8)
+```
+
+where:
+ - `nseason` is the number of seasons
+ - `nspace` is the number of areas
+ - `logSDR` is the recruitment deviation
+ - `moveslope` is the slope of the movement function
+
+`df` here contains both the input data to the model, as well as the parameters from the assessment model.
+For instance the recruitment deviations
+
+```{r, echo = TRUE}
+df.plot <- data.frame(R = as.numeric(df$parms$Rin), years = df$years)
+```
+```{r}
+ggplot(df.plot, aes(x = years, y = R)) +
+  geom_point() +
+  theme_bw() +
+  scale_y_continuous("recruitment\ndeviations")
+```
+
+# Run the operating model
+
+We can then use the data frame `df` to run an operating model by the parameters specified previously. The function returns a list with a range of different values:
+
+```{r, echo = TRUE}
+sim.data <- run.agebased.true.catch(df)
+names(sim.data)
+```
+
+We can for instance plot the spawning stock biomass (per country) and the total catch:
+
+```{r}
+ssb <- as.data.frame(sim.data$SSB)
+ssb$years <- df$years
+
+ssb <-  melt(ssb, measure.vars = 1:df$nspace,
+             id.vars = "years",
+             variable.name = "space",
+             value.name = "SSB")
+
+ssbplot  <- ggplot(ssb, aes(x = years, y = SSB, color = space)) +
+  geom_line(size = 1.3) +
+  theme_light() +
+  scale_color_manual(values = c("red","blue"))
+
+catch <- data.frame(years = df$years, catch = sim.data$Catch)
+catchplot  <- ggplot(catch, aes(x = years, y = catch)) +
+  geom_line(size = 1.3, color = "black") +
+  geom_point() +
+  theme_light()
+
+ssbplot + catchplot
+```
+
+Or look at the dimensions of some of the simulated data (e.g., space, time, age):
+
+```{r, echo = TRUE}
+dim(sim.data$N.save.age)
+dimnames(sim.data$N.save.age)
+```
+
+The operating model can be simulated into the future by changing the input to the `df`
+
+```{r}
+df.future  <- load_data_seasons(nseason = 4,
+                                nspace = 2,
+                                bfuture = 1, 
+                                yr_future = 50)
+```
+where:
+
+- `bfuture` is the bias adjustment in the future. It has to be changed based on number of simulations
+- `yr_future` is the number of years into the future
+
+Run the OM again. `load_data_seasons()` uses average historical catch for the future as the default:
+
+```{r, echo = TRUE}
+sim.future <- run.agebased.true.catch(df.future)
+```
+
+Plot the recruitment and spawning biomass:
+
+```{r}
+ssb <- as.data.frame(sim.future$SSB.all[,,3]) # Look at SSB in season 3
+ssb$years <- as.numeric(rownames(ssb))
+
+ssb.plot <- melt(ssb, measure.vars = 1:df$nspace,
+                 id.vars = "years",
+                 variable.name = "space",
+                 value.name = "SSB")
+
+ssbplot  <- ggplot(ssb.plot, aes(x = years, y = SSB * 1e-6, color = space)) +
+  geom_line(size = 1.3) +
+  theme_minimal() +
+  scale_y_continuous("SSB\n(million tonnes)") +
+  scale_color_manual(values = c("red","blue"))
+
+R.df <- data.frame(R = rowSums(sim.future$R.save), years = df.future$years)
+
+Rplot <- ggplot(R.df, aes(x = years, y = R*1e-6)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() +
+  scale_y_continuous("recruits\n(millions)")
+
+ssbplot + Rplot
+```
+
+# Multiple simulations
+
+Multiple simulations can be run by sourcing files setup for this purpose. For example, to run the HCR MSE, `source()` the file `R/run_MSE_HCR.R`. This is what is in that file:
+
+```{r echo = TRUE, eval = FALSE}
+library(PacifichakeMSE)
+library(here)
+
+fns <- c("MSE_A_HCR",
+         "MSE_B_JMC",
+         "MSE_C_realized",
+         "MSE_D_Floor50")
+
+plotnames <- c("Base scenario",
+               "Historical TAC",
+               "Realized",
+               "Floor 50")
+
+run_mses(ss_extdata_dir = "SS32018",
+         nruns = 2,
+         simyears = 30,
+         fns = fns,
+         plotnames = plotnames,
+         tacs = 1:4,
+         om_params_seed = 12345,
+         results_root_dir = here("results"),
+         results_dir = here("results", "hcr"),
+         nseason = 4,
+         nspace = 2,
+         bfuture = 0.5,
+         yr_future = 50)
+```
+
+where:
+
+- `fns` is a vector of file names to use for the scenarios (a .rds extension is optional and will be appended if missing).
+- `plotnames` is a vector of the same length as `fns` which are the names of the scenarios that will appear on the plots.
+- `nseason`, `nspace`, `bfuture`, and `yr_future` are arguments that are passed to `load_data_seasons()`.
+You can add more if you like.
+- The results will be stored in the directory given by `results_root_dir`/`results_dir` relative to the project directory. Once the function has completed, the files defined in `fns` will be found there.
+- `nruns` is purposely low so that you can try this. It should be 100 or more for final analyses.
+
+Note that the recruitment deviations are calculated in `load_data_seasons()`, which is called from within `run_mses()`. Type `?run_mses` for help and full descriptions of all the arguments.
+
+To plot the outputs, look at the file `R/plot_hcr.R`. A simplified version is shown here:
+
+First we retrieve the results of the runs we just did:
+
+```{r, echo = TRUE}
+ps_hcr <- setup_mse_plot_objects(results_dir = here::here("results/hcr"))
+```
+
+Then we plot them using plot functions which take `ps_hcr` as an argument. Here are a few plots as examples, all available are listed in the file `R/plot_hcr.R`:
+
+```{r, echo = TRUE}
+plot_bars_country_season(ps_hcr)
+```
+
+```{r, echo = TRUE}
+plot_violins_country(ps_hcr)
+```
+
+```{r, echo = TRUE}
+plot_aa(ps_hcr, type = "survey")
+```
+
+```{r, echo = TRUE}
+plot_aa(ps_hcr, type = "catch")
+```
+
+Note that all plot functions output `ggplot2` objects, so they can be modified using additional `ggplot2` commands. To zoom in, use `coord_cartesian()`, to add a ribbon use `geom_ribbon()`:
+
+```{r, echo = TRUE}
+plot_ssb_ssb0(ps_hcr) +
+  coord_cartesian(ylim = c(0.0, 2.0)) +
+  geom_ribbon(aes(ymin = p5, ymax = p95), linetype = 0)
+```
+
+# Estimation model
+
+The second model in the MSE is the estimation model, which is a copy of the current Pacific hake assessment model, but rewritten in TMB compared to SS3.
+
+```{r}
+# Files that needs to be added to the package
+source('R/getParameters_ss.R')
+source('R/load_data_ss.R')
+source('R/getUncertainty.R')
+
+# First load the estimation model (also figure out how to make this baseline in the model)
+compile("src/runHakeassessment.cpp")
+dyn.load(dynlib("src/runHakeassessment"))
+
+# For comparison load the stock synthesis model (this is the 2018 veriosn)
+mod <- SS_output('inst/extdata/SS32018/', printstats=FALSE, verbose = FALSE) # Use R4SS to load
+
+
+df.OM <- load_data_seasons(nseason = 1, nspace = 1) # Compare it with a simple OM (1 area, 1 season)
+sim.data <- run.agebased.true.catch(df.OM) # Run the OM
+
+parms.ss <- getParameters_ss(mod) # Get the parameters to be estimated in TMB form
+df <- load_data_ss(mod)
+
+obj <-MakeADFun(df,parms.ss,DLL="runHakeassessment", silent = TRUE)
+
+# Look at the data before fitting the model
+reps <- obj$report()
+
+# Create a data frame of spawning biomass
+SSB.ss3 <- mod$derived_quants$Value[grep('SSB_1966', mod$derived_quants$Label):grep('SSB_2018', mod$derived_quants$Label)]
+
+df.plot <- data.frame(SSB = c(reps$SSB, sim.data$SSB, SSB.ss3*0.5),
+                      years = rep(df$years, 3),
+                      model = rep(c('EM','OM','SS3')))
+
+
+
+ggplot(df.plot, aes(x = years, y = SSB*1e-6))+geom_line()+theme_minimal()+facet_wrap(~model, ncol = 3)+
+  scale_y_continuous('SSB\n(tonnes)')
+
+
+```
+
+
+The plots are virtually identical, when running them with the same parameter inputs. Let's try to fit the TMB model to 1) the real data, and 2) to the operating model
+
+```{r}
+
+# First specify the parameter bounds
+lower <- obj$par-Inf
+upper <- obj$par+Inf
+
+# Some specific bounds to help the model converge
+lower[names(lower) == 'F0'] <- 0.001
+upper[names(upper) == 'PSEL'] <- 9
+upper[names(upper) == 'logh'] <- log(0.999)
+upper[names(upper) == 'F0'] <- 2
+upper[names(upper) == 'psel_fish'] <- 3
+#upper[names(upper) == 'logphi_catch'] <- log(1)
+lower[names(lower) == 'psel_fish'] <- 0.0001
+
+
+
+system.time(opt<-nlminb(obj$par,obj$fn,obj$gr,lower=lower,upper=upper, # First find the MLE of the parameters
+                        control = list(iter.max = 1e6,
+                                       eval.max = 1e6))) #
+
+system.time(rep<-sdreport(obj)) # Calculate the hessian
+
+sdrep <- summary(rep) # Summary report of parameters and uncertainty
+rep.values<-rownames(sdrep)
+
+df$nyear <- length(df$years) # Add some values here for plotting
+df$year <- df$years
+
+SSB <- getUncertainty('SSB',df, sdrep) # Get the uncertainty estimates
+SSB$model <- 'TMB' #
+
+
+df.plot <- data.frame(SSB = c(SSB$value, SSB.ss3*0.5),
+                      SEmin = c(SSB$min, rep(NA, df$nyear)),
+                      SEmax = c(SSB$max, rep(NA, df$nyear)),
+                      years = rep(df$years, 2),
+                      model = rep(c('TMB','SS3'), each = df$nyear))
+
+
+# Plot the fitted model vs the SS3 model
+ggplot(df.plot, aes(x = years, y = SSB, color = model))+geom_line()+theme_minimal()+
+  geom_ribbon(data = df.plot, aes(ymin = SEmin, ymax = SEmax), fill = alpha('red', alpha = 0.15),
+              linetype = 0, show.legend = FALSE)
+
+
+```
+
+Second we can fit the model to the operating model for a simulation analysis. Turning the OM into a TMB object is done using the function 'create_TMB_data' which takes input 'sim.data' (the operating model) and 'df' (the operating model parameters)
+
+```{r}
+
+df.sim <- create_TMB_data(sim.data, df.OM ) # prepare the data input from TMB based on the operating model
+parms.sim <- df.OM$parms # Take the parameter input also used in the OM for initial parameters
+
+# Add fishing mortality and recruitment to estimated parameters
+F0 <- rowSums(sim.data$Fout) # Fishing mortality is calculated internally in the OM
+Rdev <- parms.sim$Rin[1:(length(parms.sim$Rin)-1)] # We can't estimate the recruitment in the last year
+
+
+parms.sim$F0 <- F0#rowSums(sim.data$Fsave, na.rm = TRUE)
+parms.sim$Rin <- Rdev#parms.new$Rin[1:(length(parms.new$Rin)-1)]
+
+
+obj.OM <- MakeADFun(df.sim,parms.sim,DLL="runHakeassessment", silent = TRUE) # Run the assessment
+```
+
+This leads to the following fit
+```{r, echo = FALSE}
+
+system.time(opt<-nlminb(obj.OM$par,obj.OM$fn,obj.OM$gr,lower=lower,upper=upper,
+                        control = list(iter.max = 1e6,
+                                       eval.max = 1e6))) # If error one of the random effects is unused
+
+system.time(rep<-sdreport(obj.OM)) # Calculate the hessian
+
+sdrep <- summary(rep) # Summary report of parameters and uncertainty
+rep.values<-rownames(sdrep)
+
+SSB <- getUncertainty('SSB',df.sim, sdrep) # Get the uncertainty estimates
+SSB$model <- 'EM' #
+
+
+df.plot <- data.frame(SSB = c(SSB$value, sim.data$SSB),
+                      SEmin = c(SSB$min, rep(NA, df$nyear)),
+                      SEmax = c(SSB$max, rep(NA, df$nyear)),
+                      years = rep(df$years, 2),
+                      model = rep(c('TMB','OM'), each = df$nyear))
+
+
+# Plot the fitted model vs the SS3 model
+p.ssb <- ggplot(df.plot, aes(x = years, y = SSB, color = model))+geom_line()+theme_minimal()+
+  geom_ribbon(data = df.plot, aes(ymin = SEmin, ymax = SEmax), fill = alpha('red', alpha = 0.15),
+              linetype = 0, show.legend = FALSE)
+print(p.ssb)
+```
+
+Pretty good fit - but the models are also identical.
+
+
+# Look at the non timevarying parameters
+Not sure why SSB is so close, but R0 seems to be so far away?
+
+  ```{r}
+idx <- 1:3 # Which parameters to plot
+
+df.parms <- data.frame(parms = rep(rep.values[idx],2),
+                       value = exp(c(sdrep[idx,1], as.numeric(parms.sim[idx]))),
+                       SEMin = c(exp(sdrep[idx,1])-2*sdrep[idx,2], rep(NA, length(idx))),
+                       SEMax = c(exp(sdrep[idx,1])+2*sdrep[idx,2], rep(NA, length(idx))),
+                       model = rep(c('EM','OM'), each = length(idx))
+)
+
+ggplot(df.parms, aes(x = parms, y = value, color = model))+geom_point()+
+  facet_wrap(~parms, scales = 'free')+geom_errorbar(aes(ymin = SEMin, ymax = SEMax), width = 0.1)+theme_minimal()
+
+
+```
+# Run the models combined as an MSE
+
+Now that we know the basic structure of the code, we can prepare a range of MSE simulations. The MSEs run from the function 'run_multiple_MSEs' which takes input 'simyears' which is the number of years to simulate, and 'df' which is the data frame that is used to initialize the operating model. There are furthermore a range of input parameters that can be changed (with defaults), such as the movement parameters, seeds, and type of TAC .To run several MSE's one needs to loop over the function.
+
+```{r}
+
+simyears <- 4 # run 2 yrs to make it quick
+
+df <- load_data_seasons(nseason = 4, nspace = 2, nsurvey = 1) # This one has a survey every year
+
+tmp <- run_multiple_MSEs(simyears = simyears,
+                         seeds = 123,
+                         TAC = 1, # Options are TAC 1) HCR, 2) historical, 3) realized
+                         df = df)
+
+
+
+```
+
+Note that the run_multiple_MSEs summarizes the data, so to get different output, one would have to manipulate the function. It is pretty condensed right now to ensure that the save files don't explode in size.
+Currently, the operating model is being re-run every year in the simulation, which is pretty inefficient (probably adds about 30 secs to each MSE run). Needs to be fixed.
+The function plots the fit to the spawning biomass in the final year including the uncertainty in estimation.
+
+An example of a full MSE loop is printed below
+```{r, eval = FALSE}
+
+ls.save <- list()
+ls.converge <- matrix(0, nruns)
+
+
+for (i in 1:nruns){
+  tmp <- run_multiple_MSEs(simyears = simyears,
+                           seeds = seeds[i],
+                           TAC = 1, df = df, cincrease = 0, mincrease = 0)
+  print(i)
+
+  if(is.list(tmp)){
+    ls.save[[i]] <-tmp
+    ls.converge[i] <- 1
+  }else{
+    ls.save[[i]] <- NA
+    ls.converge[i] <- 0
+  }
+
+
+}
+
+
+```
+
+Alternatively, the function 'fnMSE' exists, which can be used to run bulk MSE's where 'df' is constant
+
+```{r, eval = FALSE}
+df <- load_data_seasons(nseason = 4, nspace = 2) #  Initilialize data
+ls.save <- fnMSE(df, simyears = 3, nruns = 2) # Run 2 MSE's 3 years into the future
+
+```
+
+
+Using a saved MSE run we can plot the data.
+The function 'summarizeMSE' summarizes all the MSEs in the dataframe, and can be used to internally calculate objectives.
+
+```{r}
+
+# This data set assumes the fishery follows the control rule and movement is constant
+load('results/Climate/MSErun_move_JMC_climate_0_0_HYBR_TAC1.Rdata') # Saved as ls.save
+
+
+# ls.save contains 100 MSE runs, each which contains the following data
+names(ls.save[[1]])
+
+# USe this fcuntion to get a summary of the MSE
+p <- summarizeMSE(ls.save)
+
+catchplot <- ggplot(p$catch, aes(x = year, y = catchmean))+geom_line()+
+  geom_ribbon(aes(ymin = quantsmin, ymax = quantsmax),fill = alpha('red', alpha = 0.2))+
+  scale_y_continuous('catch')+theme_minimal()
+
+SSBplot <- ggplot(p$SSB, aes(x = year, y = SSBmean))+geom_line()+
+  geom_ribbon(aes(ymin = quantsmin, ymax = quantsmax),fill = alpha('red', alpha = 0.2))+
+  scale_y_continuous('SSB')+theme_minimal()
+
+catchplot+SSBplot
+
+```
