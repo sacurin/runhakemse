@@ -1,9 +1,15 @@
+library(PacifichakeMSE)
 library(dplyr)
 library(reshape2)
 library(ggplot2)
 
 # This will assign plotnames to what they were when set up before running the MSE
 ps_hcr <- setup_mse_plot_objects(results_dir = here::here("results/hcr"))
+
+# If you want to add quantiles so that you can show a different CI on the plots.
+# The default is quants = c(0.05, 0.25, 0.5, 0.75, 0.95))
+ps_hcr <- setup_mse_plot_objects(results_dir = here::here("results/hcr"),
+                                 quants = c(0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95))
 
 # This will re-order the scenarios in the plot
 ps_hcr <- setup_mse_plot_objects(results_dir = here::here("results/hcr"),
@@ -38,3 +44,5 @@ plot_ssb_ssb0(ps_hcr) +
   coord_cartesian(ylim = c(0.0, 2.0)) +
   geom_ribbon(aes(ymin = p5, ymax = p95), linetype = 0)
 plot_catch_quota_1panel(ps_hcr)
+
+plot_tac_vs_hcr(ps_hcr)

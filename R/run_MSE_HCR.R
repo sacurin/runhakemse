@@ -8,7 +8,7 @@ library(here)
 results_root_dir <- here("results")
 results_dir <- here("results", "hcr")
 
-fns <- c("01_MSE_A_HCR"),
+fns <- c("01_MSE_A_HCR",
          "02_MSE_B_JMC",
          "03_MSE_C_realized",
          "04_MSE_D_Floor50")
@@ -21,7 +21,10 @@ plotnames <- c("Base scenario",
 run_mses(ss_extdata_dir = "SS32018",
          nruns = 2,
          simyears = 30,
+         syear = 1966,
          myear = 2018,
+         ages = 0:20,
+         sel_change_yr = 1991,
          fns = fns,
          plotnames = plotnames,
          tacs = 1:4,
