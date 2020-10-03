@@ -14,14 +14,15 @@ plotnames <- c("Base scenario",
                "US small \nselectivity",
                "2018 selectivity")
 
-# The list of same length as the number of scenarios, one item for each scenario
-# If zero, not used, else a vector of two, the in season catch and the slippage
-# which is multiplied by the new catch
-tacs <- list(c(139482.707564733, 0.378286339), # JMC values
+# List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario
+# For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
+# If a single value (use zero) instead of a vector, the new catch in the OM is c_new * 0.5 unless
+# below catch_floor in which case it is c_new = catch_floor
+# In any event, if the calculation is greater than c_new, c_new will be used instead
+tacs <- list(c(139482.707564733, 0.378286339), # JMC values (see run_MSE_HCR.R)
              c(139482.707564733, 0.378286339),
              c(139482.707564733, 0.378286339))
 
-ages <- 0:20
 run_mses(ss_model_output_dir = ss_model_output_dir,
          overwrite_ss_rds = FALSE,
          n_runs = 2,
@@ -48,7 +49,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          space_names = c("Canada", "US"),
          s_yr = 1966,
          m_yr = 2018,
-         ages = ages,
+         ages = 0:20,
          age_names = paste("age", ages),
          move_max_init = 0.35,
          move_fifty_init = 6,
