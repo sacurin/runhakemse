@@ -1,4 +1,4 @@
-library(PacifichakeMSE)
+library(pacifichakemse)
 library(here)
 
 results_root_dir <- here("results")
@@ -23,6 +23,17 @@ tacs <- list(c(0, 1),
              c(0, 1),
              c(0, 1))
 
+# A vector with one element for each scenario, which is additional proportion of the stock to be
+# moved from space 2 to space 1 (into Canada). If a single value instead of a vector, that value
+# will be used for all scenarios.
+movein_increases <- c(0.00, 0.02, 0.04)
+# A vector with one element for each scenario, which is additional proportion of the stock to be
+# moved from space 1 to space 2 (out of Canada). If a single value instead of a vector, that value
+# will be used for all scenarios.
+moveout_decreases <- c(0.00, 0.005, 0.02)
+
+sel_changes <- 0
+
 run_mses(ss_model_output_dir = ss_model_output_dir,
          overwrite_ss_rds = FALSE,
          n_runs = 30,
@@ -31,11 +42,9 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
-         # If sel_changes, c_increases, or m_increases are length 1, that value will be used for all scenarios
-         # If it is a vector, it must be the same length as the number of scenarios or an error will be thrown
-         c_increases = c(0.00, 0.02, 0.04),
-         m_increases = c(0.00, 0.005, 0.02),
-         sel_changes = 0,
+         c_increases = movein_increases,
+         m_increases = moveout_decreases,
+         sel_changes = sel_changes,
          f_sim = 0.2,
          random_seed = 12345,
          results_root_dir = results_root_dir,
@@ -65,6 +74,8 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          s_max = 6,
          s_min_survey = 2,
          s_max_survey = 6,
+         # Value to use for final ages s_max and s_max_survey (typically 1 but can be set less here)
+         selex_fill_val = 1,
          yr_future  = 0,
          sel_hist = TRUE,
          f_space = c(0.2612, 0.7388),

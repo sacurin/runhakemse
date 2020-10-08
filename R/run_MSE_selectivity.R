@@ -1,4 +1,4 @@
-library(PacifichakeMSE)
+library(pacifichakemse)
 library(here)
 
 results_root_dir <- here("results")
@@ -23,6 +23,18 @@ tacs <- list(c(139482.707564733, 0.378286339), # JMC values (see run_MSE_HCR.R)
              c(139482.707564733, 0.378286339),
              c(139482.707564733, 0.378286339))
 
+# A vector with one element for each scenario, which is additional proportion of the stock to be
+# moved from space 2 to space 1 (into Canada). If a single value instead of a vector, that value
+# will be used for all scenarios.
+movein_increases <- 0
+# A vector with one element for each scenario, which is additional proportion of the stock to be
+# moved from space 1 to space 2 (out of Canada). If a single value instead of a vector, that value
+# will be used for all scenarios.
+moveout_decreases <- 0
+
+# A vector with one element for each scenario, which is additional proportion of the stock to be
+sel_changes <- c(0, 1, 2)
+
 run_mses(ss_model_output_dir = ss_model_output_dir,
          overwrite_ss_rds = FALSE,
          n_runs = 2,
@@ -31,11 +43,9 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
-         # If sel_changes, c_increases, or m_increases are length 1, that value will be used for all scenarios
-         # If it is a vector, it must be the same length as the number of scenarios or an error will be thrown
-         c_increases = 0,
-         m_increases = 0,
-         sel_changes = 0:2,
+         c_increases = movein_increases,
+         m_increases = moveout_decreases,
+         sel_changes = sel_changes,
          f_sim = 0.2,
          random_seed = 12345,
          results_root_dir = results_root_dir,
@@ -50,7 +60,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          s_yr = 1966,
          m_yr = 2018,
          ages = 0:20,
-         age_names = paste("age", ages),
+         age_names = paste("age", 0:20),
          move_max_init = 0.35,
          move_fifty_init = 6,
          n_surveys = rep(2, length(fns)),
@@ -60,12 +70,15 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          move_south = 0.05,
          move_init = NULL,
          move_slope = 0.9,
-         ages_no_move = c(0, 1),
+         ages_no_move = 0:1,
          s_min = 1,
          s_max = 6,
          s_min_survey = 2,
          s_max_survey = 6,
-         yr_future  = 0,
+         # Value to use for final ages s_max and s_max_survey (typically 1 but can be set less here)
+         selex_fill_val = 1,
+         # Years to simulate into the future in the operating model
+         yr_future = 0,
          sel_hist = TRUE,
          f_space = c(0.2612, 0.7388),
          log_phi_survey = log(11.46),
