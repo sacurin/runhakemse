@@ -5,3 +5,6 @@
 results
 temp
 results*
+*.png
+*.pdf
+*.rds
