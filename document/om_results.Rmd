@@ -1,0 +1,125 @@
+---
+title: "Comparison between old and new MSE code"
+date: "Oct 13, 2020"
+output: 
+  pdf_document:
+    extra_dependencies: ["float"]
+---
+
+```{r setup, include = FALSE}
+library(gridExtra)
+library(here)
+library(knitr)
+load_all("../../pacifichakemse")
+#library(pacifichakemse)
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+theme_set(hake_theme())
+
+if(!file.exists("om.rds")){
+  ss_model_yr <- 2018
+  ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                                   "extdata", paste0("SS3_", ss_model_yr))
+  ss_model_data_csv_dir <- "C:/github/pacific-hake/hake-assessment/data"
+  ss_model_raw <- load_ss_model_from_rds(ss_model_output_dir,
+                                         ss_model_data_csv_dir,
+                                         load_extra_mcmc = FALSE,
+                                         overwrite_ss_rds = FALSE)
+  ss_model <- load_ss_model_data(ss_model_raw)
+  om <- load_data_om(ss_model, n_sim_yrs = 5, rdev_seed = 42)
+  om <- run_om(om, verbose = FALSE)
+  saveRDS(om, "om.rds")
+}
+om <- readRDS("om.rds")
+```
+
+## Comparison of OM outputs
+
+The following plots show comparisons between the old OM code (Nis') and the new OM code (*pacifichakemse*). All the outputs shown here have associated automated tests in the *pacifichakemse* package, and all are identical. The choice for future recruitment seed greatly affects the outcome in both the old and new OMs, but it affects them the same way (i.e the results with any given seed are identical).
+
+To see these tests, look in this file: https://github.com/pacific-hake/pacifichakemse/blob/master/tests/testthat/test-run-om.R
+
+There are several part of the new OM that have hardwired values that were used in the old OM. These were added to compare the outputs to make sure they are the same but should be removed and the tests changed once we are satisfied that this is working as it should. Here is a list of links to what has been hardwired:
+
+- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/calc_catch_seas_country.R#L82
+- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/extract_catch_country.R#L32
+- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/run_multiple_MSEs.R#L101
+- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/ss-model-loading.R#L431
+
+Also the catch country file (*landings-tac-history.csv*) does not add up to the total catch in the SS model data file. The new OM uses what is in the SS model, but the old code uses the catch from the file. See: 
+https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/load_dat_om.R#L270
+
+```{r ssb, fig.cap = "SSB difference between the two Operating models. These OMs are conditioned to 2018, and are simulated to 2023. The random seed used for both here is 42."}
+compare_biomass(om)
+```
+
+```{r ssb_12345, fig.cap = "SSB difference between the two Operating models. These OMs are conditioned to 2018, and are simulated to 2023. The random seed used for the new code's future recruitment deviations here is 12345 and for the old is 42. Note the old OM produces the same result as the new OM for a random seed of 12345, or any other seed."}
+fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                "extdata", "om_12345_out.rds")
+om_12345 <- readRDS(fn)
+compare_biomass(om_12345)
+```
+
+```{r age-comps, fig.cap = "Average age in catch for the old and new OMs"}
+compare_age_comps(om)
+```
+
+\clearpage
+
+```{r age-in-catch-by-country, fig.cap = "Average age in catch by country for the new OM"}
+compare_age_in_catch(om$catch_save_age)
+```
+
+```{r age-in-catch-by-country-old, fig.cap = "Average age in catch by country for the old OM"}
+fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                "extdata", "om_nis.rds")
+om_nis <- readRDS(fn)
+compare_age_in_catch(om_nis$Catch.save.age)
+```
+
+```{r movement, fig.cap = "Movement by season and country for the new OM"}
+fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                "extdata", "om_nis.rds")
+om_nis <- readRDS(fn)
+p <- compare_move(om)
+do.call("grid.arrange", c(p, ncol = 2))
+```
+
+```{r movement-old, fig.cap = "Movement by season and country for the old OM"}
+fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                "extdata", "om_nis.rds")
+om_nis <- readRDS(fn)
+om_nis$ages <- om$ages
+om_nis$n_age <- om$n_age
+p <- compare_move(om_nis)
+do.call("grid.arrange", c(p, ncol = 2))
+```
