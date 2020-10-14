@@ -2,8 +2,8 @@
 title: "Comparison between old and new MSE code"
 date: "Oct 13, 2020"
 output: 
-  pdf_document:
-    extra_dependencies: ["float"]
+  pdf_document
+urlcolor: blue
 ---
 
 ```{r setup, include = FALSE}
@@ -64,21 +64,23 @@ om <- readRDS("om.rds")
 
 ## Comparison of OM outputs
 
-The following plots show comparisons between the old OM code (Nis') and the new OM code (*pacifichakemse*). All the outputs shown here have associated automated tests in the *pacifichakemse* package, and all are identical. The choice for future recruitment seed greatly affects the outcome in both the old and new OMs, but it affects them the same way (i.e the results with any given seed are identical).
+The following plots show comparisons between the old OM code (Nis') and the new OM code (*pacifichakemse*). All the outputs shown here have associated automated tests in the *pacifichakemse* package, and all comparisons with the old code produce identical results. The choice for future recruitment seed greatly affects the projected years in both the old and new OMs, but it affects them the same way (i.e the results with any given seed are identical).
 
 To see these tests, look in this file: https://github.com/pacific-hake/pacifichakemse/blob/master/tests/testthat/test-run-om.R
 
-There are several part of the new OM that have hardwired values that were used in the old OM. These were added to compare the outputs to make sure they are the same but should be removed and the tests changed once we are satisfied that this is working as it should. Here is a list of links to what has been hardwired:
+There are several part of the new OM that have hardwired values that were used in the old OM. These were temporarily added to the new code to make sure that the model outputs are the same and should be removed and the testing suite changed once we are satisfied that this is working as it should. Here is a list of Github permalinks to the lines in files that have been hardwired:
 
-- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/calc_catch_seas_country.R#L82
-- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/extract_catch_country.R#L32
-- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/run_multiple_MSEs.R#L101
-- https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/ss-model-loading.R#L431
+- [calc_catch_seas_country.R](https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/calc_catch_seas_country.R#L82)
+- [extract_catch_country.R](https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/extract_catch_country.R#L32)
+- [run_multiple_MSEs.R](https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/run_multiple_MSEs.R#L101)
+- [ss-model-loading.R](https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/ss-model-loading.R#L431)
 
-Also the catch country file (*landings-tac-history.csv*) does not add up to the total catch in the SS model data file. The new OM uses what is in the SS model, but the old code uses the catch from the file. See: 
+The catch-by-country data is located in the file [landings-tac-history.csv](https://github.com/pacific-hake/pacifichakemse/blob/master/inst/extdata/csv-data/landings-tac-history.csv). When the two values of catch for each year are summed, they do not add up to the total catch in the SS model data file for the years after 2005. This is an issue with the assessment as well and needs fixing. 
+
+For the by-country catch, the new OM uses what is in the [landings-tac-history.csv](https://github.com/pacific-hake/pacifichakemse/blob/master/inst/extdata/csv-data/landings-tac-history.csv) file, but the old code uses the catch from the file [catch_per_country.csv](https://github.com/pacific-hake/pacifichakemse/blob/master/inst/extdata/csv-data/catch_per_country.csv) and the new OM has that hardwired in temporarily because the values are different in the two files. We should decide which to use and figure out how the [catch_per_country.csv](https://github.com/pacific-hake/pacifichakemse/blob/master/inst/extdata/csv-data/catch_per_country.csv) file was calculated. See the relevant code lines here: 
 https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba92bb0b5eb3f4d/R/load_dat_om.R#L270
 
-```{r ssb, fig.cap = "SSB difference between the two Operating models. These OMs are conditioned to 2018, and are simulated to 2023. The random seed used for both here is 42."}
+```{r ssb, fig.cap = "SSB difference between the two Operating models. These OMs are conditioned to 2018, and are simulated to 2023. The random seed used for both here is  Note that the lines are exactly overlapping for the whole time series."}
 compare_biomass(om)
 ```
 
@@ -89,17 +91,21 @@ om_12345 <- readRDS(fn)
 compare_biomass(om_12345)
 ```
 
-```{r age-comps, fig.cap = "Average age in catch for the old and new OMs"}
+```{r age-comps-season-3, fig.cap = "Weighted average age in catch for the old and new OMs for season 3. This is calculated as the sum of (mean of country age proportions * age vector)."}
 compare_age_comps(om)
+```
+
+```{r age-comps-season-4, fig.cap = "Weighted average age in catch for the old and new OMs for season 4."}
+compare_age_comps(om, season = 4)
 ```
 
 \clearpage
 
-```{r age-in-catch-by-country, fig.cap = "Average age in catch by country for the new OM"}
+```{r age-in-catch-by-country, fig.cap = "Average age in catch by country for the new OM. This is calculated as the fishing mortality * numbers-at-age * weight-at-age"}
 compare_age_in_catch(om$catch_save_age)
 ```
 
-```{r age-in-catch-by-country-old, fig.cap = "Average age in catch by country for the old OM"}
+```{r age-in-catch-by-country-old, fig.cap = "Average age in catch by country for the old OM."}
 fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                 "extdata", "om_nis.rds")
 om_nis <- readRDS(fn)
@@ -122,4 +128,16 @@ om_nis$ages <- om$ages
 om_nis$n_age <- om$n_age
 p <- compare_move(om_nis)
 do.call("grid.arrange", c(p, ncol = 2))
+```
+
+\clearpage
+
+### Comparison of different selectivity scenarios
+
+```{r sel-by-country-new, fig.cap = "Selectivity scenarios by country for the new OM"}
+plot_selectivity_scenarios(om)
+```
+
+```{r sel-by-country-old, fig.cap = "Selectivity scenarios by country for the old OM"}
+plot_selectivity_scenarios(om, "old")
 ```
