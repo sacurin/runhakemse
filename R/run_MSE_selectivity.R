@@ -1,10 +1,15 @@
-library(pacifichakemse)
+#library(pacifichakemse)
+load_all("../pacifichakemse")
 library(here)
 
 results_root_dir <- here("results")
 results_dir <- file.path(results_root_dir, "selectivity")
 
-ss_model_output_dir <- "C:/tmp/PacifichakeMSE/inst/extdata/SS32018"
+ss_model_yr <- 2018
+ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                                 "extdata", paste0("SS3_", ss_model_yr))
+ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                                   "extdata", "csv-data")
 
 fns <- c("MSE_sel1.rds",
          "MSE_sel2.rds",
@@ -19,9 +24,9 @@ plotnames <- c("Base scenario",
 # If a single value (use zero) instead of a vector, the new catch in the OM is c_new * 0.5 unless
 # below catch_floor in which case it is c_new = catch_floor
 # In any event, if the calculation is greater than c_new, c_new will be used instead
-tacs <- list(c(139482.707564733, 0.378286339), # JMC values (see run_MSE_HCR.R)
-             c(139482.707564733, 0.378286339),
-             c(139482.707564733, 0.378286339))
+tacs <- list(c(139482.707564733, 0.378286338688197), # JMC values (see run_MSE_HCR.R)
+             c(139482.707564733, 0.378286338688197),
+             c(139482.707564733, 0.378286338688197))
 
 # A vector with one element for each scenario, which is additional proportion of the stock to be
 # moved from space 2 to space 1 (into Canada). If a single value instead of a vector, that value
@@ -33,12 +38,13 @@ movein_increases <- 0
 moveout_decreases <- 0
 
 # A vector with one element for each scenario, which is additional proportion of the stock to be
-sel_changes <- c(0, 1, 2)
+sel_changes <- c(0, 0, 0)
 
 run_mses(ss_model_output_dir = ss_model_output_dir,
+         data_csv_dir = ss_model_data_csv_dir,
          overwrite_ss_rds = FALSE,
-         n_runs = 2,
-         n_sim_yrs = 4,
+         n_runs = 1,
+         n_sim_yrs = 5,
          sel_change_yr = 1991,
          fns = fns,
          plot_names = plotnames,
@@ -61,7 +67,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          age_names = paste("age", 0:20),
          move_max_init = 0.35,
          move_fifty_init = 6,
-         n_surveys = rep(2, length(fns)),
+         n_surveys = 2,
          rdev_sd = 1.4,
          b_future = 0.5,
          move_out = 0.85,
@@ -77,8 +83,6 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          f_space = c(0.2612, 0.7388),
          log_phi_survey = log(11.46),
          catch_floor = 180000,
-         catch_props_space_season = list(c(0.001, 0.188, 0.603, 0.208),
-                                         c(0.000, 0.317, 0.382, 0.302)),
          pope_mul = 0.5,
          verbose = FALSE)
 

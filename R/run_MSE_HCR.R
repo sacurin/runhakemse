@@ -26,8 +26,8 @@ plotnames <- c("Base HCR scenario",
 # below catch_floor in which case it is c_new = catch_floor
 # In any event, if the calculation is greater than c_new, c_new will be used instead
 tacs <- list(c(0, 1), # Base
-             c(139482.707564733, 0.378286339), # JMC
-             c(177193.540429722, 0.184425111), # Realized
+             c(139482.707564733, 0.378286338688197), # JMC
+             c(177193.540429722, 0.184425110839867), # Realized
              0) # Floor 50%
 
 # A vector with one element for each scenario, which is additional proportion of the stock to be

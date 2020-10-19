@@ -7,6 +7,7 @@ urlcolor: blue
 ---
 
 ```{r setup, include = FALSE}
+library(devtools)
 library(gridExtra)
 library(here)
 library(knitr)
@@ -45,21 +46,39 @@ opts_chunk$set(
 
 theme_set(hake_theme())
 
-if(!file.exists("om.rds")){
+if(!file.exists("om_0.rds") |
+   !file.exists("om_1.rds") |
+   !file.exists("om_2.rds")){
   ss_model_yr <- 2018
   ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", paste0("SS3_", ss_model_yr))
-  ss_model_data_csv_dir <- "C:/github/pacific-hake/hake-assessment/data"
+  ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
+                                     "extdata", "csv-data")
   ss_model_raw <- load_ss_model_from_rds(ss_model_output_dir,
                                          ss_model_data_csv_dir,
                                          load_extra_mcmc = FALSE,
-                                         overwrite_ss_rds = FALSE)
+                                         overwrite_ss_rds = TRUE)
   ss_model <- load_ss_model_data(ss_model_raw)
-  om <- load_data_om(ss_model, n_sim_yrs = 5, rdev_seed = 42)
-  om <- run_om(om, verbose = FALSE)
-  saveRDS(om, "om.rds")
+  om <- load_data_om(ss_model, yr_future = 5, rdev_seed = 42)
+
+  om$selectivity_change <- 0
+  om_0 <- run_om(om, verbose = FALSE)
+  saveRDS(om_0, "om_0.rds")
+
+  om$selectivity_change <- 1
+  om_1 <- run_om(om, verbose = FALSE)
+  saveRDS(om_1, "om_1.rds")
+  
+  om$selectivity_change <- 2
+  om_2 <- run_om(om, verbose = FALSE)
+  saveRDS(om_2, "om_2.rds")
 }
-om <- readRDS("om.rds")
+
+om <- om_0 <- readRDS("om_0.rds")
+om_1 <- readRDS("om_1.rds")
+om_2 <- readRDS("om_2.rds")
+
+
 ```
 
 ## Comparison of OM outputs
@@ -101,7 +120,7 @@ compare_age_comps(om, season = 4)
 
 \clearpage
 
-```{r age-in-catch-by-country, fig.cap = "Average age in catch by country for the new OM. This is calculated as the fishing mortality * numbers-at-age * weight-at-age"}
+```{r age-in-catch-by-country, fig.cap = "Weighted average age in catch by country for the new OM. This is calculated as the mean of [(F_season / Z) * (1 - exp(-Z) * numbers-at-age * weight-at-age] * age vector"}
 compare_age_in_catch(om$catch_save_age)
 ```
 
@@ -135,9 +154,9 @@ do.call("grid.arrange", c(p, ncol = 2))
 ### Comparison of different selectivity scenarios
 
 ```{r sel-by-country-new, fig.cap = "Selectivity scenarios by country for the new OM"}
-plot_selectivity_scenarios(om)
+plot_selectivity_scenarios(om_0, om_1, om_2)
 ```
 
 ```{r sel-by-country-old, fig.cap = "Selectivity scenarios by country for the old OM"}
-plot_selectivity_scenarios(om, "old")
+plot_selectivity_scenarios(om_0, om_1, om_2, "old")
 ```
