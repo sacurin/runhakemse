@@ -38,10 +38,11 @@ movein_increases <- 0
 moveout_decreases <- 0
 
 # A vector with one element for each scenario, which is additional proportion of the stock to be
-sel_changes <- c(0, 0, 0)
+sel_changes <- c(0, 1, 2)
 
 run_mses(ss_model_output_dir = ss_model_output_dir,
-         data_csv_dir = ss_model_data_csv_dir,
+         ss_model_data_csv_dir = ss_model_data_csv_dir,
+         load_extra_mcmc = FALSE,
          overwrite_ss_rds = FALSE,
          n_runs = 1,
          n_sim_yrs = 5,
@@ -57,7 +58,6 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
          ss_mcmc_quants = c(0.025, 0.5, 0.975),
-         load_extra_mcmc = FALSE,
          # Arguments to load_data_seasons(), for OM setup
          n_season = 4,
          season_names = c("Season1", "Season2", "Season3", "Season4"),
