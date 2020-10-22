@@ -37,6 +37,7 @@ movein_increases <- c(0.00, 0.02, 0.04)
 # will be used for all scenarios.
 moveout_decreases <- c(0.00, 0.005, 0.02)
 
+# A vector with one element for each scenario, or a single value to use for all scenarios
 sel_changes <- 0
 
 run_mses(ss_model_output_dir = ss_model_output_dir,

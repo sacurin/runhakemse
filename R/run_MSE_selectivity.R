@@ -17,7 +17,7 @@ fns <- c("MSE_sel1.rds",
 
 plotnames <- c("Base scenario",
                "US small \nselectivity",
-               "2018 selectivity")
+               paste0(ss_model_yr, " selectivity"))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
@@ -37,7 +37,7 @@ movein_increases <- 0
 # will be used for all scenarios.
 moveout_decreases <- 0
 
-# A vector with one element for each scenario, which is additional proportion of the stock to be
+# A vector with one element for each scenario, or a single value to use for all scenarios
 sel_changes <- c(0, 1, 2)
 
 run_mses(ss_model_output_dir = ss_model_output_dir,
