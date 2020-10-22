@@ -21,10 +21,11 @@ plotnames <- c("Base HCR scenario",
                "Realized",
                "Floor 50")
 
-# List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario
+# List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
-# If a single value (use zero) instead of a vector, the new catch in the OM is c_new * 0.5 unless
-# below catch_floor in which case it is c_new = catch_floor
+# If instead of a 2-element vector, a single value of zero is given, no TAC will be applied. For any
+# other single value, the expanded catch in the OM will be c_new * 0.5 unless below catch_floor in
+# which case it will be c_new = catch_floor.
 # In any event, if the calculation is greater than c_new, c_new will be used instead
 tacs <- list(c(0, 1), # Base
              c(139482.707564733, 0.378286338688197), # JMC
