@@ -1,0 +1,252 @@
+---
+title: "MSE results for n = 100 runs"
+date: "Nov 2, 2020"
+output: 
+  pdf_document
+urlcolor: blue
+---
+
+```{r setup-r-env, include = FALSE}
+library(devtools)
+library(gridExtra)
+library(here)
+library(knitr)
+load_all("../../pacifichakemse")
+#library(pacifichakemse)
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+theme_set(hake_theme())
+
+overwrite_rds <- FALSE
+ps <- create_plot_objects(scenarios = c("biasadjust",
+                                        "climate",
+                                        "hcr",
+                                        "selectivity"),
+                          main_results_dir = "results_100",
+                          overwrite_rds = overwrite_rds,
+                          short_term_yrs = 2018:2022,
+                          long_term_yrs = 2022,
+                          can.prop = 0.2488,
+                          us.prop = 0.7612,
+                          quants = c(0.05, 0.25, 0.5, 0.75, 0.95))
+# Now ps is a list of 4 scenarios:
+# biasadjust
+ps_b <- ps[[1]]
+# climate
+ps_c <- ps[[2]]
+# hcr values
+ps_h <- ps[[3]]
+# selectivity
+ps_s <- ps[[4]]
+```
+
+## Biasadjust scenario
+
+```{r tacv-biasadjust, fig.cap = "Bias adjustment scenarios TAC/V by season and country."}
+plot_bars_country(ps_b)
+```
+
+```{r ssb-biasadjust, fig.cap = "Bias adjustment scenarios SSB in middle of the year."}
+yr_start <- 2010
+plot_ssb(ps_b, yr_lim = c(yr_start, NA))
+```
+
+```{r ssb-ssb0-biasadjust, fig.cap = "Bias adjustment scenarios relative spawning biomass."}
+plot_ssb_ssb0(ps_b)
+```
+
+```{r pmetrics-biasadjust, fig.cap = "Bias adjustment scenarios violin plots of performace metrics."}
+plot_violins(ps_b)
+```
+
+```{r exploitation-biasadjust, fig.cap = "Bias adjustment scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
+plot_violins_country(ps_b)
+```
+
+```{r catch-biasadjust, fig.cap = "Bias adjustment scenarios future projections of catch."}
+plot_catch(ps_b)
+```
+
+```{r aa-survey-biasadjust, fig.cap = "Bias adjustment scenarios average age in survey."}
+plot_aa(ps_b, type = "survey", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-biasadjust, fig.cap = "Bias adjustment scenarios average age in catch."}
+plot_aa(ps_b, type = "catch", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-country-biasadjust, fig.cap = "Bias adjustment scenarios average age in catch by country."}
+plot_aa_country(ps_b, type = "catch", country_colors = c("darkred", "blue4"), yr_lim = c(yr_start, NA))
+```
+
+```{r std-err-biasadjust, fig.cap = "Bias adjustment scenarios standard error of estimated to real spawning stock biomass."}
+plot_standard_error(ps_b)
+```
+
+\clearpage
+
+## Climate scenario
+
+```{r tacv-climate, fig.cap = "Climate scenarios TAC/V by season and country."}
+plot_bars_country(ps_c)
+```
+
+```{r ssb-climate, fig.cap = "Climate scenarios SSB in middle of the year."}
+yr_start <- 2010
+plot_ssb(ps_c, yr_lim = c(yr_start, NA))
+```
+
+```{r ssb-ssb0-climate, fig.cap = "Climate scenarios relative spawning biomass."}
+plot_ssb_ssb0(ps_c)
+```
+
+```{r pmetrics-climate, fig.cap = "Climate scenarios violin plots of performace metrics."}
+plot_violins(ps_c)
+```
+
+```{r exploitation-climate, fig.cap = "Climate scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
+plot_violins_country(ps_c)
+```
+
+```{r catch-climate, fig.cap = "Climate scenarios future projections of catch."}
+plot_catch(ps_c)
+```
+
+```{r aa-survey-climate, fig.cap = "Climate scenarios average age in survey."}
+plot_aa(ps_c, type = "survey", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-climate, fig.cap = "Climate scenarios average age in catch."}
+plot_aa(ps_c, type = "catch", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-country-climate, fig.cap = "Climate scenarios average age in catch by country."}
+plot_aa_country(ps_c, type = "catch", country_colors = c("darkred", "blue4"), yr_lim = c(yr_start, NA))
+```
+
+```{r std-err-climate, fig.cap = "Climate scenarios standard error of estimated to real spawning stock biomass."}
+plot_standard_error(ps_c)
+```
+
+\clearpage
+
+## HCR scenario
+
+```{r tacv-hcr, fig.cap = "HCR scenarios TAC/V by season and country."}
+plot_bars_country(ps_h)
+```
+
+```{r ssb-hcr, fig.cap = "HCR scenarios SSB in middle of the year."}
+yr_start <- 2010
+plot_ssb(ps_h, yr_lim = c(yr_start, NA))
+```
+
+```{r ssb-ssb0-hcr, fig.cap = "HCR scenarios relative spawning biomass."}
+plot_ssb_ssb0(ps_h)
+```
+
+```{r pmetrics-hcr, fig.cap = "HCR scenarios violin plots of performace metrics."}
+plot_violins(ps_h)
+```
+
+```{r exploitation-hcr, fig.cap = "HCR scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
+plot_violins_country(ps_h)
+```
+
+```{r catch-hcr, fig.cap = "HCR scenarios future projections of catch."}
+plot_catch(ps_h)
+```
+
+```{r aa-survey-hcr, fig.cap = "HCR scenarios average age in survey."}
+plot_aa(ps_h, type = "survey", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-hcr, fig.cap = "HCR scenarios average age in catch."}
+plot_aa(ps_h, type = "catch", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-country-hcr, fig.cap = "HCR scenarios average age in catch by country."}
+plot_aa_country(ps_h, type = "catch", country_colors = c("darkred", "blue4"), yr_lim = c(yr_start, NA))
+```
+
+```{r std-err-hcr, fig.cap = "HCR scenarios standard error of estimated to real spawning stock biomass."}
+plot_standard_error(ps_h)
+```
+
+\clearpage
+
+## Selectivity scenarios
+
+```{r tacv-selectivity, fig.cap = "Selectivity scenarios TAC/V by season and country."}
+plot_bars_country(ps_s)
+```
+
+```{r ssb-selectivity, fig.cap = "Selectivity scenarios SSB in middle of the year."}
+yr_start <- 2010
+plot_ssb(ps_s, yr_lim = c(yr_start, NA))
+```
+
+```{r ssb-ssb0-selectivity, fig.cap = "Selectivity scenarios relative spawning biomass."}
+plot_ssb_ssb0(ps_s)
+```
+
+```{r pmetrics-selectivity, fig.cap = "Selectivity scenarios violin plots of performace metrics."}
+plot_violins(ps_s)
+```
+
+```{r exploitation-selectivity, fig.cap = "Selectivity scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
+plot_violins_country(ps_s)
+```
+
+```{r catch-selectivity, fig.cap = "Selectivity scenarios future projections of catch."}
+plot_catch(ps_s)
+```
+
+```{r aa-survey-selectivity, fig.cap = "Selectivity scenarios average age in survey."}
+plot_aa(ps_s, type = "survey", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-selectivity, fig.cap = "Selectivity scenarios average age in catch."}
+plot_aa(ps_s, type = "catch", yr_lim = c(yr_start, NA))
+```
+
+```{r aa-catch-country-selectivity, fig.cap = "Selectivity scenarios average age in catch by country."}
+plot_aa_country(ps_s, type = "catch", country_colors = c("darkred", "blue4"), yr_lim = c(yr_start, NA))
+```
+
+```{r std-err-selectivity, fig.cap = "Selectivity scenarios standard error of estimated to real spawning stock biomass."}
+plot_standard_error(ps_s)
+```
+
+
+
+
