@@ -21,9 +21,9 @@ plotnames <- c("Base scenario",
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
-# If instead of a 2-element vector, a single value of zero is given, no TAC will be applied. For any
-# other single value, the expanded catch in the OM will be c_new * 0.5 unless below catch_floor in
-# which case it will be c_new = catch_floor.
+# If instead of a 2-element vector, a single value is given, the expanded catch in the OM will be
+# c_new * 0.5 unless below catch_floor in which case it will be c_new = catch_floor.
+# To apply no TAC, use c(0, 1).
 # In any event, if the calculation is greater than c_new, c_new will be used instead
 tacs <- list(c(0, 1),
              c(0, 1),
@@ -65,6 +65,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          n_space = 2,
          space_names = c("Canada", "US"),
          ages = 0:20,
+         age_plus_grp = 15,
          age_names = paste("age", 0:20),
          move_max_init = 0.35,
          move_fifty_init = 6,
