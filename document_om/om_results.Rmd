@@ -49,36 +49,38 @@ theme_set(hake_theme())
 if(!file.exists("om_0.rds") |
    !file.exists("om_1.rds") |
    !file.exists("om_2.rds")){
+
+  set.seed(12345)
+  seed <- floor(runif(n = 1, min = 1, max = 1e6))
+
   ss_model_yr <- 2018
   ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", paste0("SS3_", ss_model_yr))
   ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                      "extdata", "csv-data")
-  ss_model_raw <- load_ss_model_from_rds(ss_model_output_dir,
-                                         ss_model_data_csv_dir,
-                                         load_extra_mcmc = FALSE,
-                                         overwrite_ss_rds = TRUE)
-  ss_model <- load_ss_model_data(ss_model_raw)
-  om <- load_data_om(ss_model, yr_future = 5, rdev_seed = 42)
+  ss_model <- load_ss_model_data(ss_model_output_dir = ss_model_output_dir,
+                                 ss_model_data_csv_dir = ss_model_data_csv_dir,
+                                 load_extra_mcmc = FALSE,
+                                 overwrite_ss_rds = TRUE)
+  
+  om <- load_data_om(ss_model, yr_future = 50)
 
   om$selectivity_change <- 0
-  om_0 <- run_om(om, verbose = FALSE)
+  om_0 <- run_om(om, random_seed = seed, verbose = FALSE)
   saveRDS(om_0, "om_0.rds")
 
   om$selectivity_change <- 1
-  om_1 <- run_om(om, verbose = FALSE)
+  om_1 <- run_om(om, random_seed = seed, verbose = FALSE)
   saveRDS(om_1, "om_1.rds")
   
   om$selectivity_change <- 2
-  om_2 <- run_om(om, verbose = FALSE)
+  om_2 <- run_om(om, random_seed = seed, verbose = FALSE)
   saveRDS(om_2, "om_2.rds")
 }
 
 om <- om_0 <- readRDS("om_0.rds")
 om_1 <- readRDS("om_1.rds")
 om_2 <- readRDS("om_2.rds")
-
-
 ```
 
 ## Comparison of OM outputs
@@ -101,13 +103,6 @@ https://github.com/pacific-hake/pacifichakemse/blob/ed020567e7801fde9b81bc81eba9
 
 ```{r ssb, fig.cap = "SSB difference between the two Operating models. These OMs are conditioned to 2018, and are simulated to 2023. The random seed used for both here is  Note that the lines are exactly overlapping for the whole time series."}
 compare_biomass(om)
-```
-
-```{r ssb_12345, fig.cap = "SSB difference between the two Operating models. These OMs are conditioned to 2018, and are simulated to 2023. The random seed used for the new code's future recruitment deviations here is 12345 and for the old is 42. Note the old OM produces the same result as the new OM for a random seed of 12345, or any other seed."}
-fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
-                "extdata", "om_12345_out.rds")
-om_12345 <- readRDS(fn)
-compare_biomass(om_12345)
 ```
 
 ```{r age-comps-season-3, fig.cap = "Weighted average age in catch for the old and new OMs for season 3. This is calculated as the sum of (mean of country age proportions * age vector)."}
@@ -135,6 +130,7 @@ compare_age_in_catch(om_nis$Catch.save.age)
 fn <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                 "extdata", "om_nis.rds")
 om_nis <- readRDS(fn)
+
 p <- compare_move(om)
 do.call("grid.arrange", c(p, ncol = 2))
 ```
