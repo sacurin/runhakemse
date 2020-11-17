@@ -136,3 +136,18 @@ Parallelism could not be integrated into the R code in this case, so there is a 
 There is one extra batch script included for convenience, to create all the plot object files. It is called `create_plot_objects.bat` and can be run once all the other scripts have finished.
 
 Note that `Rscript` must be on your `PATH` for these scripts to work.
+
+## Building the MSE and OM documents included in the project
+
+To build PDF documents from the Rmd files included in this project, open the Rmd file and click `Knit` (if in RStudio). This will create a PDF document with the same name inside the directory in which the Rmd file resides, and open a previewer showing the file once done.
+
+Or, if you want to debug your document using `browser()` calls, or you are not using RStudio:
+
+``` r 
+setwd("document_mse")
+bookdown::render_book("mse_results.Rmd")
+```
+
+This will create a PDF document called `_main.pdf` inside the directory in which the Rmd file resides, but will not open a previewer showing the file.
+
+The same can be done for the OM document.
