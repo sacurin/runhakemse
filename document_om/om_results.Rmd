@@ -2,7 +2,10 @@
 title: "Comparison between old and new MSE code"
 date: "Nov 10, 2020"
 output: 
-  pdf_document
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: header.tex
 urlcolor: blue
 ---
 
