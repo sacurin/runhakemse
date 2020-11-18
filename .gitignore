@@ -4,6 +4,10 @@
 .Ruserdata
 results
 temp
+original*
 results*
 *.png
 *.pdf
+*.rds
+_main*
+*.log
