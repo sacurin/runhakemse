@@ -2,7 +2,10 @@
 title: "MSE results for n = 20 runs"
 date: "Nov 13, 2020"
 output: 
-  pdf_document
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: header.tex
 urlcolor: blue
 ---
 
@@ -44,6 +47,15 @@ opts_chunk$set(
   fig.align = fig_align,
   fig.pos = fig_pos)
 
+# Make all inline numeric values have comma separator for thousands
+knit_hooks$set(inline = function(x){
+  if(!is.numeric(x)){
+    x
+  }else{
+    prettyNum(x, big.mark = ",")
+  }
+})
+
 theme_set(hake_theme())
 
 overwrite_rds <- FALSE
@@ -76,6 +88,36 @@ plot_timeseries(ps_b,
                 ci_lines = FALSE,
                 yr_lim = c(yr_start, NA),
                 rev_scenarios = TRUE)
+```
+
+```{r ssb-ssb0-biasadjust087-table}
+yr_start <- 2019
+table_timeseries(ps_b,
+                 type = "ssb_ssb0",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1,
+                 decimals = 3,
+                 caption = "Table of mid-year Relative Spawning Biomass values for the bias adjust = 0.87 scenario.")
+```
+
+```{r ssb-biasadjust087-table}
+yr_start <- 2019
+table_timeseries(ps_b,
+                 type = "ssb",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1,
+                 caption = "Table of mid-year Spawning Biomass values for the bias adjust = 0.87 scenario.")
+```
+
+```{r ssb-biasadjust0-table}
+yr_start <- 2019
+table_timeseries(ps_b,
+                 type = "ssb",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1,
+                 by_country = TRUE,
+                 inc_mean = FALSE,
+                 caption = "Table of mid-year Spawning Biomass values by country for the bias adjust = 0.87 scenario.")
 ```
 
 ```{r ssb-biasadjust-by-country, fig.cap = "Bias adjustment scenarios Spawning biomass by country. Scenario label background colors match scenario colors in other plots."}
@@ -153,6 +195,16 @@ plot_timeseries(ps_c,
                 yr_lim = c(yr_start, NA))
 ```
 
+```{r catch-quota-climate-table}
+yr_start <- 2019
+table_timeseries(ps_c,
+                 type = "catch_quota",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1,
+                 decimals = 3,
+                 caption = "Catch / quota for the base climate scenario.")
+```
+
 ```{r pmetrics-climate, fig.cap = "Climate scenarios violin plots of performace metrics."}
 plot_violins(ps_c)
 ```
@@ -170,12 +222,14 @@ plot_timeseries(ps_c,
                 ci_lines = FALSE)
 ```
 
-```{r aa-survey-climate, fig.cap = "Climate scenarios average age in survey."}
-yr_start <- 2010
-plot_timeseries(ps_c,
-                type = "aas",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA))
+```{r catch-climate-table}
+yr_start <- 2019
+table_timeseries(ps_c,
+                 type = "catch",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1,
+                 decimals = 3,
+                 caption = "Table of catch for the base climate scenario.")
 ```
 
 ```{r aa-catch-climate, fig.cap = "Climate scenarios average age in catch."}
@@ -192,6 +246,17 @@ plot_timeseries(ps_c,
                 yr_lim = c(yr_start, NA),
                 by_country = TRUE,
                 facet_back_alpha = 50)
+```
+
+```{r aa-catch-bycountry-climate-table}
+yr_start <- 2040
+table_timeseries(ps_c,
+                 type = "aac",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1,
+                 decimals = 2,
+                 by_country = TRUE,
+                 caption = "Average age in the catch by country for the base climate scenario.")
 ```
 
 ```{r std-err-climate, fig.cap = "Climate scenarios standard error of estimated to real spawning stock biomass."}
