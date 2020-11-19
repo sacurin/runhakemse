@@ -100,13 +100,15 @@ table_timeseries(ps_b,
                  caption = "Table of mid-year Relative Spawning Biomass values for the bias adjust = 0.87 scenario.")
 ```
 
-```{r ssb-biasadjust087-table}
+```{r ssb-biasadjust-table}
 yr_start <- 2019
 table_timeseries(ps_b,
                  type = "ssb",
                  yr_lim = c(yr_start, NA),
-                 scen = 1,
-                 caption = "Table of mid-year Spawning Biomass values for the bias adjust = 0.87 scenario.")
+                 scen = 1:3,
+                 inc_mean = FALSE,
+                 caption = "Table of mid-year Spawning Biomass values for the three bias adjust scenarios.") %>% 
+  kableExtra::kable_styling(font_size = 9)
 ```
 
 ```{r ssb-biasadjust0-table}
@@ -200,9 +202,10 @@ yr_start <- 2019
 table_timeseries(ps_c,
                  type = "catch_quota",
                  yr_lim = c(yr_start, NA),
-                 scen = 1,
+                 scen = 1:3,
                  decimals = 3,
-                 caption = "Catch / quota for the base climate scenario.")
+                 caption = "Catch / quota for the climate scenarios.") %>% 
+    kableExtra::kable_styling(font_size = 9)
 ```
 
 ```{r pmetrics-climate, fig.cap = "Climate scenarios violin plots of performace metrics."}
