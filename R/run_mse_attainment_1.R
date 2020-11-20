@@ -19,7 +19,7 @@ plotnames <- c("Unfished baseline",
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
-attains <- list(c(0, 0),
+attains <- list(c(0.001, 0.001),
                 c(1, 1))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
