@@ -1,6 +1,6 @@
 ---
-title: "MSE attainment results for n = 20 runs"
-date: "Nov 20, 2020"
+title: "MSE attainment results for n = 100 runs"
+date: "Nov 22, 2020"
 output: 
   rmarkdown::pdf_document:
     fig_caption: yes
@@ -81,18 +81,6 @@ ps2 <- ps[[2]]
 #                   "77% US, 90% CA")
 ```
 
-I sent this out via email instead of on the Github repository which is public. I think this should stay between us at this point.
-
-Here is a first look at the attainment scenarios, obviously very rough but what we would expect to happen seems to be happening With no fishing the average age goes up by two years, and the SSB increases. Fishing in the US has a huge impact on the stock as we would expect. Fishing with full attainment in the US only has almost the same impact on biomass as fishing coastwide with full attainment.
-
-Interestingly, full attainment in Canada and zero in the US gives the largest increase in age in catch. This is probably very interesting to the stakeholders as they always say that not enough older fish enter Canada due to US fishing (Figure 9).
-
-The violin plots (Figure 6 - short term catch) and the catch plot (Figure 8) show the zeroing of the catch well for the unfished case.
-
-I'll add some issues later to address why some plots have values for unfished cases. 
-
-Note that setting the catch to zero for the zero-attainment scenarios caused the minimizer to crash so I set those to 0.001 (0.1%) attainment to make it run.
-
 # Attainment scenarios with 0% and 100% attainment (Items 1-4)
 
 ```{r tacv-attain, fig.cap = "TAC / Vulnerable biomass by season and country."}
@@ -136,6 +124,7 @@ plot_timeseries(ps1,
                 legend_position = c(0.22, 0.15))
 ```
 
+<!--
 ```{r catch-quota-attain-table}
 yr_start <- 2019
 table_timeseries(ps1,
@@ -146,17 +135,27 @@ table_timeseries(ps1,
                  caption = "Catch / quota for the Attainment scenarios.") %>% 
     kableExtra::kable_styling(font_size = 6)
 ```
+-->
 
 ```{r pmetrics-attain, fig.cap = "Attainment scenarios violin plots of performace metrics."}
 plot_violins(ps1)
 ```
 
-```{r pmetrics-attain-table}
+```{r pmetrics-attain-table-1}
 table_perf_metrics(ps1, 
                    decimals = 3,
-                   scen = c(1, 3),
+                   scen = 1:2,
                    caption = "Performance metrics for the Attainment scenarios.") %>% 
-      kableExtra::kable_styling(font_size = 7)
+      kableExtra::kable_styling(font_size = 8)
+```
+
+```{r pmetrics-attain-table-2}
+table_perf_metrics(ps1, 
+                   decimals = 3,
+                   scen = 3:4,
+                   #scen_names = c("A", "B", "C", "D"),
+                   caption = "Performance metrics for the Attainment scenarios.") %>% 
+      kableExtra::kable_styling(font_size = 8)
 ```
 
 ```{r exploitation-attain, fig.cap = "Attainment scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
@@ -173,17 +172,39 @@ plot_timeseries(ps1,
                 legend_position = c(0.22, 0.85))
 ```
 
-```{r aa-catch-attain, fig.cap = "Attainment scenarios average age in catch."}
+```{r aa-catch-attain, fig.cap = "Attainment scenarios average age in the true population."}
+yr_start <- 2010
 plot_timeseries(ps1,
-                type = "aac",
+                type = "aap",
                 ci_lines = FALSE,
                 yr_lim = c(yr_start, NA),
                 legend_position = c(0.22, 0.85))
 ```
 
-```{r aa-catch-country-attain, fig.cap = "Attainment scenarios average age in catch by country."}
+```{r aap-table-1}
+yr_start <- 2045
+table_timeseries(ps1,
+                 type = "aap",
+                 yr_lim = c(yr_start, NA),
+                 scen = 1:2,
+                 decimals = 2,
+                 caption = "Average age in the population for the Unfished and Full attainment scenarios.")
+```
+
+```{r aap-table-2}
+yr_start <- 2045
+table_timeseries(ps1,
+                 type = "aap",
+                 yr_lim = c(yr_start, NA),
+                 scen = 3:4,
+                 decimals = 2,
+                 caption = "Average age in the population for the scenarios representing Full/Zero attainments for CAN/US.")
+```
+
+```{r aa-catch-country-attain, fig.cap = "Attainment scenarios average age in the true population by country."}
+yr_start <- 2010
 plot_timeseries(ps1,
-                type = "aac",
+                type = "aap",
                 ci_lines = FALSE,
                 yr_lim = c(yr_start, NA),
                 by_country = TRUE,
@@ -191,15 +212,48 @@ plot_timeseries(ps1,
                 legend_position = c(0.08, 0.9))
 ```
 
-```{r aa-catch-bycountry-attain-table}
-yr_start <- 2040
+```{r aap-bycountry-attain-table-1}
+yr_start <- 2045
 table_timeseries(ps1,
-                 type = "aac",
+                 type = "aap",
                  yr_lim = c(yr_start, NA),
                  scen = 1,
                  decimals = 2,
                  by_country = TRUE,
-                 caption = "Average age in the catch by country for the base Attainment scenario.")
+                 caption = "Average age in the population by country for the unfished scenario.")
+```
+
+```{r aap-bycountry-attain-table-2}
+yr_start <- 2045
+table_timeseries(ps1,
+                 type = "aap",
+                 yr_lim = c(yr_start, NA),
+                 scen = 2,
+                 decimals = 2,
+                 by_country = TRUE,
+                 caption = "Average age in the population by country for the full attainment coastwide scenario.")
+```
+
+```{r aap-bycountry-attain-table-3}
+yr_start <- 2045
+table_timeseries(ps1,
+                 type = "aap",
+                 yr_lim = c(yr_start, NA),
+                 scen = 3,
+                 decimals = 2,
+                 by_country = TRUE,
+                 caption = "Average age in the population by country for the full attainment Canada, zero in the US scenario.")
+```
+
+```{r aap-bycountry-attain-table-4}
+yr_start <- 2045
+table_timeseries(ps1,
+                 type = "aap",
+                 yr_lim = c(yr_start, NA),
+                 scen = 4,
+                 decimals = 2,
+                 by_country = TRUE,
+                 caption = "Average age in the population by country for the full attainment US, zero in Canada scenario.")
 ```
 
 ```{r std-err-attain, fig.cap = "Attainment scenarios standard error of estimated to real spawning stock biomass."}
@@ -211,10 +265,12 @@ plot_standard_error(ps1,
 
 # Attainment scenarios with other attainment (Items 1 and 5-9)
 
+<!--
 ```{r tacv-attain-other, fig.cap = "TAC / Vulnerable biomass by season and country."}
 plot_bars_country(ps2,
                   facet_back_alpha = 50)
 ```
+-->
 
 ```{r ssb-attain-other, fig.cap = "Attainment scenarios SSB in middle of the year."}
 yr_start <- 2010
@@ -222,7 +278,9 @@ plot_timeseries(ps2,
                 type = "ssb",
                 ci_lines = FALSE,
                 yr_lim = c(yr_start, NA),
-                legend_position = c(0.25, 0.80))
+                legend_position = c(0.25, 0.8)) #+
+  #coord_cartesian(xlim = c(2045, 2048), ylim = c(0, 1))
+  
 ```
 
 ```{r ssb-attain-other-country, fig.cap = "Attainment scenarios SSB in middle of the year by country."}
