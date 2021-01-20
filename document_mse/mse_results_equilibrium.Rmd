@@ -126,7 +126,7 @@ xt<- as.data.frame(sim_data$ssb_all[,1,]) %>%
                 values_to='ssb', 
                 names_transform=list(seas=as.integer)) %>%
    mutate(country='Canada') %>%
-   mutate(time=year+seas/4)
+   mutate(time=year+seas/4-0.25)
 
  yt<- as.data.frame(sim_data$ssb_all[,2,]) %>%
    mutate(year=yrs) %>%
@@ -135,7 +135,7 @@ xt<- as.data.frame(sim_data$ssb_all[,1,]) %>%
                 values_to='ssb', 
                 names_transform=list(seas=as.integer)) %>%
    mutate(country='US') %>%
-   mutate(time=year+seas/4) 
+   mutate(time=year+seas/4-0.25) 
  
  xydat=rbind(xt,yt)
  
@@ -147,22 +147,21 @@ xt<- as.data.frame(sim_data$ssb_all[,1,]) %>%
    geom_line()+
    geom_hline(yintercept=2*sum(sim_data$ssb_0)) 
 ``` 
-Now, zooming in on the last few years to better see the seasonal dynamics. Note that the low point of the annual cycle is actually the last day of the year before the labeled year, just before recruitment occurs.  So, we can see the decline in biomass happening during the year due to natural mortality.
+Now, zooming in on the last few years to better see the seasonal dynamics. Note that ssb for a given season is calculated before movement and natural mortality occurs.  We can see the decline in biomass happening over each season due to natural mortality.
 ```{r, fig.cap="Coastwide SSB by season, zoomed in to last 3 years of the projection"} 
  ggplot(tot_ssb_dat, aes(time,tot)) +
    geom_line()+
    geom_hline(yintercept=2*sum(sim_data$ssb_0)) +
    xlim(2115,2118)
 ```
-If we plot ssb by country seasonally, and compare against the area specific ssb_0 (horizontal black lines), we start to see the effects of the movement matrix.  Neither country stabilizes at the ssb_0 values specified in the area-specific stock-recruit curves.  
+If we plot ssb by country seasonally, and compare against the area specific ssb_0 (horizontal black lines), we start to see the effects of the movement matrix.  Note that neither country's ssb stabilizes at the ssb_0 values specified in the area-specific stock-recruit curves.  
 ```{r, fig.cap="Time-series of seasonal (quarterly) SSB by area.  Solid horizontal lines are the area-specific SSB0 values specified in the intial conditions (0.75 and 0.25 of the coastwide SSB0)"}
  ggplot(xydat, aes(time,ssb, color=country)) +
    geom_line() +
    geom_hline(yintercept=2*(sim_data$ssb_0))
 ```
-Like before, let's zoom in to see the equilibrium dynamics better. The annual mortality pattern seen in the previous graph is apparent in the US portion of the population, but not in Canada because fish are moving into the northern area. 
+Like before, let's zoom in to see the equilibrium dynamics better. The annual mortality pattern seen in the previous graph is apparent in the US portion of the population, but not in Canada because fish are moving into the northern area faster than they are dying.
 
-Something that isn't making sense to me here is that ssb in Canada is still high on the last day of the year, which should be after 85 percent of the biomass has moved south.  Similarly, ssb in the US is at the lowest point on the last day of the year. 
 ```{r, fig.cap="Same as previous figure, but zoomed in to last 4 years of the simulation to show seasonal dynamics"}
  ggplot(xydat, aes(time,ssb, color=country)) +
    geom_line() +
@@ -179,7 +178,7 @@ xt<- as.data.frame(sim_data$v_save[,1,]) %>%
                 values_to='v', 
                 names_transform=list(seas=as.integer)) %>%
    mutate(country='Canada') %>%
-   mutate(time=year+seas/4)
+   mutate(time=year+seas/4-0.25)
 
  yt<- as.data.frame(sim_data$v_save[,2,]) %>%
    mutate(year=yrs) %>%
@@ -188,7 +187,7 @@ xt<- as.data.frame(sim_data$v_save[,1,]) %>%
                 values_to='v', 
                 names_transform=list(seas=as.integer)) %>%
    mutate(country='US') %>%
-   mutate(time=year+seas/4) 
+   mutate(time=year+seas/4-0.25) 
  
  xydat=rbind(xt,yt)
  
@@ -201,7 +200,7 @@ xt<- as.data.frame(sim_data$v_save[,1,]) %>%
 
 ```
 
-When we zoom in and look at the last 4 years, we see the same pattern as with seasonal ssb.  Note that vulnerable biomass (v_save) is saved each quarter before movement occurs but after natural mortality is applied. Vulnerable biomass peaks in the US in season 1 and declines through season 4.  In Canada, biomass is highest in seasons 3 and 4, and drops in season 1.  
+When we zoom in and look at the last 4 years, we see the same pattern as with seasonal ssb.  Note that vulnerable biomass (v_save) is calculated each season from the numbers at age before movement occurs but after natural mortality is applied. Vulnerable biomass peaks in the US in season 1 and declines through season 4.  In Canada, biomass is highest in seasons 3 and 4, and drops in season 1.  
   
 ```{r}
   ggplot(tot_v_dat, aes(time,total_v)) +
