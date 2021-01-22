@@ -19,7 +19,9 @@ plotnames <- c("Unfished baseline",
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
-attains <- list(c(0.001, 0.001),
+# When doing zero attainment coastwide, we must use 0.02 instead of 0 because the EM will crash the stock.
+# Below 0.006, the minimizer will begin to give NaNs in the objective function for various years.
+attains <- list(c(0, 0),
                 c(1, 1))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
@@ -47,7 +49,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
          overwrite_ss_rds = FALSE,
-         n_runs = 20,
+         n_runs = 30,
          n_sim_yrs = 30,
          fns = fns,
          plot_names = plotnames,
@@ -59,4 +61,5 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
          catch_floor = 180000,
+         save_all_em = TRUE,
          verbose = FALSE)

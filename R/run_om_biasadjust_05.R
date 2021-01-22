@@ -4,13 +4,9 @@ library(here)
 results_root_dir <- here("results")
 results_dir <- file.path(results_root_dir, "biasadjust")
 
-fns <- c("MSErun_move_nofishing_nobiasadj",
-         "MSErun_move_nofishing_biasadj",
-         "MSErun_move_nofishing_biasadj_med")
+fns <- "MSErun_move_nofishing_biasadj_med"
 
-plotnames <- c("Bias 0",
-               "Bias 0.87",
-               "Bias 0.5")
+plotnames <- "Bias 0.5"
 
 ss_model_yr <- 2018
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
@@ -28,10 +24,11 @@ run_oms(ss_model = ss_model,
         yr_future = 50,
         fns = fns,
         n_surveys = 2,
-        b_futures = c(0, 0.87, 0.5),
+        b_futures = 0.5,
         c_increases = 0,
         m_increases = 0,
         sel_changes = 0,
+        catch_in = 0,
         plot_names = plotnames,
         random_seed = 12345,
         results_root_dir = results_root_dir,

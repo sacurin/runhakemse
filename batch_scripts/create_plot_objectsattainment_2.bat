@@ -1,0 +1,1 @@
+Rscript -e "library(devtools); library(usethis); load_all('../../pacifichakemse'); setwd(here::here()); create_plot_objects(scenarios = 'attainment_2', om_only = FALSE, overwrite_rds = TRUE, short_term_yrs = 2018:2027, long_term_yrs = 2028)"

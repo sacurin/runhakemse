@@ -20,6 +20,12 @@ plotnames <- c("Base scenario",
                paste0(ss_model_yr, " selectivity"))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
+# For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
+attains <- list(c(1, 1),
+                c(1, 1),
+                c(1, 1))
+
+# List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
 # If instead of a 2-element vector, a single value is given, the expanded catch in the OM will be
 # c_new * 0.5 unless below catch_floor in which case it will be c_new = catch_floor.
@@ -51,6 +57,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
+         attains = attains,
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
