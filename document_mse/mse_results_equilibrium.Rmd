@@ -1,0 +1,233 @@
+---
+title: "MSE results for equilibrium operating model with no fishing"
+date: "Jan 4, 2021"
+output: 
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: header.tex
+urlcolor: blue
+---
+
+```{r setup-r-env, include = FALSE}
+
+library(devtools)
+library(gridExtra)
+library(here)
+library(knitr)
+library(tidyr)
+library(ggplot2)
+load_all("../../pacifichakemse")
+library(pacifichakemse)
+
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+# Make all inline numeric values have comma separator for thousands
+knit_hooks$set(inline = function(x){
+  if(!is.numeric(x)){
+    x
+  }else{
+    prettyNum(x, big.mark = ",")
+  }
+})
+
+theme_set(hake_theme())
+
+overwrite_rds <- FALSE
+ps <- create_plot_objects(scenarios = c("no_recdevs"),
+                          om_only = c(TRUE),
+                          main_results_dir = "results",
+                          overwrite_rds = overwrite_rds,
+                          short_term_yrs = 2018:2027,
+                          long_term_yrs = 2027)
+
+ps_r <- load_mse_plot_data(scenario = "no_recdevs", 
+                           overwrite_rds = FALSE, 
+                           om_only = TRUE,
+                           short_term_yrs = 2018:2027,
+                           long_term_yrs = 2027)
+
+```
+
+# No recruitment deviations, no fishing
+This run explores equilibrium movement and recruitment dynamics in the operating model to verify that equilibrium conditions that are specified as input parameters are attained and to better understand how the spatial stock recruit curve and movement matrix interact to influence spatial equilibrium dynamics. 
+
+We can verify that the beginning of the year spawning biomass reaches 0.99 of the specified coastwide B0:
+```{r ssb-beg-biasadjust, fig.cap = "Equilibrium biomass in the future without fishing, beginning of the year. The dashed lines represent unfished spawning biomass SSB0, 0.4SBB0, and 0.1SSB0."}
+yr_start <- 1965
+plot_timeseries(ps_r,
+                type = "ssb",
+                time= "beg",
+                by_country=FALSE,
+                ci_lines = FALSE,
+                yr_lim = c(yr_start, NA),
+                rev_scenarios = TRUE)
+```
+
+However, mid-year biomass is lower because half of the natural mortality has been applied. Therefore, the correct comparison to use with SSB0 is beginning of the year SSB.  Note that I should compare the bias adjustment run results to make sure that this wasn't contributing to differences between the observed dynamics and SSB0 in that set of runs too.
+
+```{r ssb-mid-biasadjust, fig.cap = "Equilibrium biomass in the future without fishing, mid-year. The dashed lines represent unfished spawning biomass SSB0, 0.4SBB0, and 0.1SSB0."}
+#yr_start <- 1960
+plot_timeseries(ps_r,
+                type = "ssb",
+                time= "mid",
+                by_country=FALSE,
+                ci_lines = FALSE,
+                yr_lim = c(yr_start, NA),
+                rev_scenarios = TRUE)
+```
+
+```{r catch-biasadjust, fig.cap = "Catch plot for no recruitment deviation scenario shows that future catch is zero."}
+plot_timeseries(ps_r,
+                type = "catch",
+                by_country=FALSE,
+                ci_lines = FALSE,
+                rev_scenarios = TRUE)
+```
+
+Let's look at the seasonal dynamics, coastwide and by country to better visualize how the movement matrix influences the spatial dynamics. The coastwide seasonal dynamics show the effect of natural mortality in each season. 
+```{r, fig.cap ="Coastwide spawning stock biomass by quarter(season).  Horizontal line is unfished SSB0 estimated in the stock assessment and specified in the operating model."}
+sim_data<-(ps_r$sim_data$`Bias 0`[[1]])
+yrs<-sim_data$yrs
+
+xt<- as.data.frame(sim_data$ssb_all[,1,]) %>%
+   mutate(year=yrs) %>%
+   pivot_longer(cols=1:4, 
+                names_to='seas', 
+                values_to='ssb', 
+                names_transform=list(seas=as.integer)) %>%
+   mutate(country='Canada') %>%
+   mutate(time=year+seas/4-0.25)
+
+ yt<- as.data.frame(sim_data$ssb_all[,2,]) %>%
+   mutate(year=yrs) %>%
+   pivot_longer(cols=1:4, 
+                names_to='seas', 
+                values_to='ssb', 
+                names_transform=list(seas=as.integer)) %>%
+   mutate(country='US') %>%
+   mutate(time=year+seas/4-0.25) 
+ 
+ xydat=rbind(xt,yt)
+ 
+ tot_ssb_dat<-xydat %>%
+   group_by(time) %>%
+   summarise(tot=sum(ssb)) 
+ 
+ ggplot(tot_ssb_dat, aes(time,tot)) +
+   geom_line()+
+   geom_hline(yintercept=2*sum(sim_data$ssb_0)) 
+``` 
+Now, zooming in on the last few years to better see the seasonal dynamics. Note that ssb for a given season is calculated before movement and natural mortality occurs.  We can see the decline in biomass happening over each season due to natural mortality.
+```{r, fig.cap="Coastwide SSB by season, zoomed in to last 3 years of the projection"} 
+ ggplot(tot_ssb_dat, aes(time,tot)) +
+   geom_line()+
+   geom_hline(yintercept=2*sum(sim_data$ssb_0)) +
+   xlim(2115,2118)
+```
+If we plot ssb by country seasonally, and compare against the area specific ssb_0 (horizontal black lines), we start to see the effects of the movement matrix.  Note that neither country's ssb stabilizes at the ssb_0 values specified in the area-specific stock-recruit curves.  
+```{r, fig.cap="Time-series of seasonal (quarterly) SSB by area.  Solid horizontal lines are the area-specific SSB0 values specified in the intial conditions (0.75 and 0.25 of the coastwide SSB0)"}
+ ggplot(xydat, aes(time,ssb, color=country)) +
+   geom_line() +
+   geom_hline(yintercept=2*(sim_data$ssb_0))
+```
+Like before, let's zoom in to see the equilibrium dynamics better. The annual mortality pattern seen in the previous graph is apparent in the US portion of the population, but not in Canada because fish are moving into the northern area faster than they are dying.
+
+```{r, fig.cap="Same as previous figure, but zoomed in to last 4 years of the simulation to show seasonal dynamics"}
+ ggplot(xydat, aes(time,ssb, color=country)) +
+   geom_line() +
+   geom_hline(yintercept=2*(sim_data$ssb_0))+
+  xlim(2115,2118)
+```
+Instead of SSB, we could plot vulnerable biomass by country. Coastwide, at a long timescale, this looks ok. 
+
+```{r, fig.cap="Total vulnerable biomass by season (quarterly)"}
+xt<- as.data.frame(sim_data$v_save[,1,]) %>%
+   mutate(year=yrs) %>%
+   pivot_longer(cols=1:4, 
+                names_to='seas', 
+                values_to='v', 
+                names_transform=list(seas=as.integer)) %>%
+   mutate(country='Canada') %>%
+   mutate(time=year+seas/4-0.25)
+
+ yt<- as.data.frame(sim_data$v_save[,2,]) %>%
+   mutate(year=yrs) %>%
+   pivot_longer(cols=1:4, 
+                names_to='seas', 
+                values_to='v', 
+                names_transform=list(seas=as.integer)) %>%
+   mutate(country='US') %>%
+   mutate(time=year+seas/4-0.25) 
+ 
+ xydat=rbind(xt,yt)
+ 
+ tot_v_dat<-xydat %>%
+   group_by(time) %>%
+   summarise(total_v=sum(v)) 
+ 
+ ggplot(tot_v_dat, aes(time,total_v)) +
+     geom_line()
+
+```
+
+When we zoom in and look at the last 4 years, we see the same pattern as with seasonal ssb.  Note that vulnerable biomass (v_save) is calculated each season from the numbers at age before movement occurs but after natural mortality is applied. Vulnerable biomass peaks in the US in season 1 and declines through season 4.  In Canada, biomass is highest in seasons 3 and 4, and drops in season 1.  
+  
+```{r}
+  ggplot(tot_v_dat, aes(time,total_v)) +
+   geom_line()+
+   xlim(2115,2118)
+ 
+ 
+ ggplot(xydat, aes(time,v, color=country)) +
+   geom_line() +
+   xlim(2115,2118)
+```
+
+To verify recruitment is behaving as we think it should, here is a plot of recruits through time by country. We can see that there is no recruitment variability in the future projections, which is what we have specified.  Because we're starting the projection period at relatively high stock size, recruitment is already at the asymptote of the stock recruit curve and is unchanging during the projection period. 
+
+```{r, fig.cap="Recruits through time by country"}
+xt<- as.data.frame(sim_data$r_save) %>%
+   rename(Canada=V1) %>%
+  rename(US=V2) %>%
+   mutate(year=yrs) %>%
+   pivot_longer(cols=Canada:US, 
+                names_to='country', 
+                values_to='recruits', 
+                names_transform=list(area=as.integer)) 
+
+
+ ggplot(xt,aes(year,recruits, col=country))+
+   geom_line() 
+```
+\clearpage
+
