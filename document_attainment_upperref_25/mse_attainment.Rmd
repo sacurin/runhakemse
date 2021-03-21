@@ -1,0 +1,115 @@
+---
+title: "MSE attainment for n = 50 runs, zero/full attainment"
+date: "Feb 18, 2021"
+output: 
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: header.tex
+urlcolor: blue
+---
+
+```{r setup-r-env, include = FALSE}
+library(devtools)
+library(gridExtra)
+library(here)
+library(knitr)
+load_all("../../pacifichakemse")
+#library(pacifichakemse)
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+# Make all inline numeric values have comma separator for thousands
+knit_hooks$set(inline = function(x){
+  if(!is.numeric(x)){
+    x
+  }else{
+    prettyNum(x, big.mark = ",")
+  }
+})
+
+theme_set(hake_theme())
+
+overwrite_rds <- FALSE
+ps <- create_plot_objects(scenarios = c("attainment_om_only",
+                                        "attainment_upperref_20"),
+                          om_only = c(TRUE, FALSE),
+                          main_results_dir = "results",
+                          overwrite_rds = overwrite_rds,
+                          short_term_yrs = 2018:2027,
+                          long_term_yrs = 2027)
+ps1 <- ps[[1]]
+ps2 <- ps[[2]]
+
+```
+
+# Operating model only (no HCR)
+
+```{r om-only-ssb, fig.cap = "Relative spawning biomass. Operating model only, no HCR."}
+yr_start <- 2010
+plot_timeseries(ps1,
+                type = "ssb_ssb0",
+                ci_lines = TRUE,
+                yr_lim = c(yr_start, NA),
+                legend_position = c(0.22, 0.85))
+```
+
+```{r om-only-catch, fig.cap = "Catch. Operating model only, no HCR."}
+yr_start <- 2010
+plot_timeseries(ps1,
+                type = "catch",
+                ci_lines = TRUE,
+                yr_lim = c(yr_start, NA),
+                legend_position = c(0.22, 0.85))
+```
+
+# Full MSE, including HCR effects
+
+```{r mse-ssb, fig.cap = "Relative spawning biomass. Full MSE attainment scenarios."}
+yr_start <- 2010
+plot_timeseries(ps2,
+                type = "ssb_ssb0",
+                ci_lines = TRUE,
+                show_25 = TRUE,
+                yr_lim = c(yr_start, NA),
+                legend_position = c(0.22, 0.85),
+                ylim = c(0, 1.5))
+```
+
+```{r mse-catch, fig.cap = "Catch. Full MSE attainment scenarios."}
+yr_start <- 2010
+plot_timeseries(ps2,
+                type = "catch",
+                ci_lines = TRUE,
+                yr_lim = c(yr_start, NA),
+                legend_position = c(0.22, 0.85))
+```
+

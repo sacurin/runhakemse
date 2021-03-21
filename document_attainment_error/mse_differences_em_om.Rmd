@@ -1,0 +1,123 @@
+---
+title: "MSE differences between EM and OM for n = 15 runs, Catch = 2,000kg for zero-attainments"
+date: "Nov 30, 2020"
+output: 
+  rmarkdown::pdf_document:
+    fig_caption: yes
+    includes:
+      in_header: header.tex
+urlcolor: blue
+---
+
+```{r setup-r-env, include = FALSE}
+library(devtools)
+library(gridExtra)
+library(here)
+library(knitr)
+load_all("../../pacifichakemse")
+#library(pacifichakemse)
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+# Make all inline numeric values have comma separator for thousands
+knit_hooks$set(inline = function(x){
+  if(!is.numeric(x)){
+    x
+  }else{
+    prettyNum(x, big.mark = ",")
+  }
+})
+
+theme_set(hake_theme())
+
+overwrite_rds <- FALSE
+ps <- create_plot_objects(scenarios = c("attainment_1",
+                                        "attainment_2"),
+                          om_only = c(FALSE, FALSE),
+                          main_results_dir = "results",
+                          overwrite_rds = overwrite_rds,
+                          short_term_yrs = 2018:2027,
+                          long_term_yrs = 2027)
+ps1 <- ps[[1]]
+ps2 <- ps[[2]]
+```
+
+Here, an absolute catch of 2,000 kg was used in place of zero for the zero-attainment values. A higher value could be used to improve the EM behaviour, which would have the SSB following the OM more closely.
+
+# Attainment scenarios with 2,000 kg as zero and 100% attainment (Items 1-4)
+
+```{r std-err-attain, fig.cap = "Standard error of estimated to real spawning stock biomass for the scenarios representing unfished, full, and zero attainment by each country."}
+plot_standard_error(ps1,
+                    facet_back_alpha = 50)
+```
+
+```{r om-vs-em-ssb-1, fig.cap = "Comparison of estimated to real spawning stock biomass for the scenarios representing unfished, full, and zero attainment by each country."}
+plot_em_timeseries(ps1,
+                   type = "ssb",
+                   ci_lines = FALSE,
+                   free_y_scale = TRUE,
+                   facet_back_alpha = 50)
+```
+
+```{r om-vs-em-catch-1, fig.cap = "Comparison of estimated to true catch for the scenarios representing unfished, full, and zero attainment by each country."}
+plot_em_timeseries(ps1,
+                   type = "catch",
+                   ci_lines = FALSE,
+                   yr_lim = c(2020, NA),
+                   free_y_scale = TRUE,
+                   facet_back_alpha = 50)
+```
+
+<!-- \newpage  -->
+<!-- \clearpage  -->
+
+<!-- # Scenarios with non-zero and non-full attainments (Items 5-9) -->
+
+<!-- ```{r sec2-std-err-attain, fig.cap = "Standard error of estimated to real spawning stock biomass for the scenarios representing 10-yr average, high and low US attainment, and high and highest Canadian attainment."} -->
+<!-- plot_standard_error(ps2, -->
+<!--                     facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- ```{r om-vs-em-ssb-2, fig.cap = "Comparison of estimated to real spawning stock biomass for the scenarios representing unfished, full, and zero attainment by each country."} -->
+<!-- plot_em_timeseries(ps2, -->
+<!--                    type = "ssb", -->
+<!--                    ci_lines = FALSE, -->
+<!--                    facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- ```{r om-vs-em-catch-2, fig.cap = "Comparison of estimated to true catch for the scenarios representing unfished, full, and zero attainment by each country."} -->
+<!-- plot_em_timeseries(ps2, -->
+<!--                    type = "catch", -->
+<!--                    ci_lines = FALSE, -->
+<!--                    yr_lim = c(2020, NA), -->
+<!--                    facet_back_alpha = 50) -->
+<!-- ``` -->
+

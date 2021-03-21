@@ -1,0 +1,10 @@
+%\usepackage{tabu} - for kableExtra::kable_styling(full_width = TRUE) which makes the table fit on the page
+% regardless of width by wrapping labels
+\usepackage{float}
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][2] {
+  \expandafter\origfigure\expandafter[H]
+} {
+  \endorigfigure
+}
