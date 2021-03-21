@@ -1,1 +1,0 @@
-Rscript -e "library(devtools); library(usethis); setwd(here::here()); source('R/run_mse_attainment_2_unfished_canada.R')"

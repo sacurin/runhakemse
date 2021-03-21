@@ -12,9 +12,9 @@ ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustW
                                    "extdata", "csv-data")
 
 #fns <- "03_us_0_can_100"
-fns <- "06_us_0_can_100_5050TAC"
+fns <- "MSE_06_us_0_can_100"
 
-plotnames <- "Full attainment CAN, no US fishery, 50/50TAC"
+plotnames <- "Full attainment CAN, no US fishery, 0.4 ref"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
@@ -50,12 +50,14 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          plot_names = plotnames,
          tacs = tacs,
          attains = attains,
-         f_space = c(0.5, 0.5),
+         f_space = c(0.2612, 0.7388),
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
          catch_floor = 180000,
+         upper_ref = 0.4,
+         f_ref = 0.4,
          save_all_em = TRUE,
          verbose = FALSE)

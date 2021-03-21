@@ -1,8 +1,9 @@
 ---
-title: "MSE attainment results for n = 100 runs"
-date: "Nov 22, 2020"
+title: "Pacific hake MSE attainment"
+date: "March, 2021"
 output: 
-  rmarkdown::pdf_document:
+  bookdown::pdf_document2:
+    toc: false
     fig_caption: yes
     includes:
       in_header: header.tex
@@ -59,325 +60,563 @@ knit_hooks$set(inline = function(x){
 theme_set(hake_theme())
 
 overwrite_rds <- FALSE
-ps <- create_plot_objects(scenarios = c("attainment_1",
-                                        "attainment_2"),
-                          om_only = c(FALSE, FALSE),
-                          main_results_dir = "results",
-                          overwrite_rds = overwrite_rds,
-                          short_term_yrs = 2018:2027,
-                          long_term_yrs = 2027)
-ps1 <- ps[[1]]
-ps2 <- ps[[2]]
+ps_zero_catch_zero_recr <- load_mse_plot_data(scenario = "attainment_zero_catch_zero_recr",
+                                              om_only = TRUE,
+                                              overwrite_rds = overwrite_rds,
+                                              short_term_yrs = 2018:2027,
+                                              long_term_yrs = 2027,
+                                              main_results_dir = "results")
 
-#ps1$plotnames <- c("0% coastwide",
-#                   "100% coastwide",
-#                   "100% CA, 0% US",
-#                   "100%US, 0% CA")
-#ps2$plotnames <- c("0% coastwide",
-#                   "10-yr-avg",
-#                   "90% US, 56% CA",
-#                   "60% US, 56% CA",
-#                   "77% US, 70% CA",
-#                   "77% US, 90% CA")
+ps_zero_catch_recr <- load_mse_plot_data(scenario = "attainment_zero_catch_recr",
+                                         om_only = TRUE,
+                                         overwrite_rds = overwrite_rds,
+                                         short_term_yrs = 2018:2027,
+                                         long_term_yrs = 2027,
+                                         main_results_dir = "results")
+
+ps_1e6_catch_zero_recr <- load_mse_plot_data(scenario = "attainment_1e6_catch_zero_recr",
+                                             om_only = TRUE,
+                                             overwrite_rds = overwrite_rds,
+                                             short_term_yrs = 2018:2027,
+                                             long_term_yrs = 2027,
+                                             main_results_dir = "results")
+
+ps_1e6_catch_recr <- load_mse_plot_data(scenario = "attainment_1e6_catch_recr",
+                                        om_only = TRUE,
+                                        overwrite_rds = overwrite_rds,
+                                        short_term_yrs = 2018:2027,
+                                        long_term_yrs = 2027,
+                                        main_results_dir = "results")
+
+ci_lines <- TRUE
+start_yr <- 2008
+
 ```
 
-# Attainment scenarios with 0% and 100% attainment (Items 1-4)
+# Operating model runs without Estimation model
 
-```{r tacv-attain, fig.cap = "TAC / Vulnerable biomass by season and country."}
-plot_bars_country(ps1,
-                  facet_back_alpha = 50)
+## Zero catch and zero recruitment
+
+The spawning biomass in Figure \@ref(fig:zero-catch-zero-recr-ssb) shows that all attainment cases overlap because there is zero catch set for all, which overrides any attainment values. The catch can be seen to drop immediately to zero in 2019 in Figure \@ref(fig:zero-catch-zero-recr-catch). This is shown as a test of the code to make sure catch is indeed zero in all cases. There is also zero recruitment so all runs have the same values and there are no confidence intervals (i.e. no random recruitment) in the spawning biomass plot. The increase here in the projection period (2019--2069) is attributed to growth only. In this case, the biomass never drops below the $B_{40\%}$ reference point, so the 40:10 adjustment is not evident.
+
+The function call used to run the full attainment coastwide scenario is as follows. The $attain$ argument is changed for other scenarios to values between zero and one for attainment proportions for Canada followed by the U.S.
+
+```{r eval = FALSE, echo = TRUE}
+run_oms(ss_model = ss_model,
+        n_runs = 100,
+        yr_future = 50,
+        fns = fns,
+        n_surveys = 2,
+        b_futures = 0,
+        c_increases = 0,
+        m_increases = 0,
+        sel_changes = 0,
+        catch_in = 0,
+        zero_catch_val = 0,
+        attain = c(1, 1),
+        upper_ref = 0.4,
+        f_ref = 0.4,
+        set_rec_devs_zero = TRUE,
+        plot_names = plotnames,
+        random_seed = 12345,
+        results_root_dir = results_root_dir,
+        results_dir = results_dir)
 ```
 
-```{r ssb-attain, fig.cap = "Attainment scenarios SSB in middle of the year."}
-yr_start <- 2010
-plot_timeseries(ps1,
+```{r zero-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch and recruitment are zero for the projected years."}
+plot_timeseries(ps_zero_catch_zero_recr,
                 type = "ssb",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.22, 0.85))
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.18, 0.85))
 ```
 
-```{r ssb-attain-country, fig.cap = "Attainment scenarios SSB in middle of the year by country."}
-yr_start <- 2010
-plot_timeseries(ps1,
-                type = "ssb",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                by_country = TRUE,
-                show_40_10 = FALSE,
-                legend_position = c(0.08, 0.9))
-```
-
-```{r ssb-ssb0-attain, fig.cap = "Attainment scenarios relative spawning biomass."}
-plot_timeseries(ps1,
-                type = "ssb_ssb0",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.22, 0.85))
-```
-
-```{r catch-quota-attain, fig.cap = "Attainment scenarios catch / quota."}
-plot_timeseries(ps1,
-                type = "catch_quota",
-                ci_lines = TRUE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.22, 0.15))
-```
-
-<!--
-```{r catch-quota-attain-table}
-yr_start <- 2019
-table_timeseries(ps1,
-                 type = "catch_quota",
-                 yr_lim = c(yr_start, NA),
-                 scen = 1:4,
-                 decimals = 2,
-                 caption = "Catch / quota for the Attainment scenarios.") %>% 
-    kableExtra::kable_styling(font_size = 6)
-```
--->
-
-```{r pmetrics-attain, fig.cap = "Attainment scenarios violin plots of performace metrics."}
-plot_violins(ps1)
-```
-
-```{r pmetrics-attain-table-1}
-table_perf_metrics(ps1, 
-                   decimals = 3,
-                   scen = 1:2,
-                   caption = "Performance metrics for the Attainment scenarios.") %>% 
-      kableExtra::kable_styling(font_size = 8)
-```
-
-```{r pmetrics-attain-table-2}
-table_perf_metrics(ps1, 
-                   decimals = 3,
-                   scen = 3:4,
-                   #scen_names = c("A", "B", "C", "D"),
-                   caption = "Performance metrics for the Attainment scenarios.") %>% 
-      kableExtra::kable_styling(font_size = 8)
-```
-
-```{r exploitation-attain, fig.cap = "Attainment scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
-plot_violins_country(ps1, facet_back_alpha = 50)
-```
-
-```{r catch-attain, fig.cap = "Attainment scenarios future projections of catch."}
-#yr_start <- NA_real_
-yr_start <- 2010
-plot_timeseries(ps1,
+```{r zero-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch and recruitment are zero for the projected years."}
+plot_timeseries(ps_zero_catch_zero_recr,
                 type = "catch",
-                yr_lim = c(yr_start, NA),
-                ci_lines = FALSE,
-                legend_position = c(0.22, 0.85))
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.85, 0.85))
+```
+\clearpage
+
+## Zero catch, recruitment drawn from a lognormal distribution
+
+Figure \@ref(fig:zero-catch-recr-ssb) shows the spawning biomass for all attainment cases with zero catch set for all, and with annual recruitment drawn from a lognormal distribution fort the projection years. The same seed is used for all scenarios, so all the values overlap exactly and the resulting plot looks like only one scenario is present. The 95% confidence interval shows that the random recruitments introduce uncertainty in the biomass output in the projection years. The catch plot (Figure \@ref(fig:zero-catch-recr-catch)) is identical to Figure \@ref(fig:zero-catch-zero-recr-catch) because there are still zero catches in all cases. It is shown here as a simple check.
+
+The function call used to run the full attainment coastwide scenario is as follows.
+
+```{r eval = FALSE, echo = TRUE}
+run_oms(ss_model = ss_model,
+        n_runs = 100,
+        yr_future = 50,
+        fns = fns,
+        n_surveys = 2,
+        b_futures = 0,
+        c_increases = 0,
+        m_increases = 0,
+        sel_changes = 0,
+        catch_in = 0,
+        zero_catch_val = 0,
+        attain = c(1, 1),
+        upper_ref = 0.4,
+        f_ref = 0.4,
+        set_rec_devs_zero = FALSE,
+        plot_names = plotnames,
+        random_seed = 12345,
+        results_root_dir = results_root_dir,
+        results_dir = results_dir)
 ```
 
-```{r aa-catch-attain, fig.cap = "Attainment scenarios average age in the true population."}
-yr_start <- 2010
-plot_timeseries(ps1,
-                type = "aap",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.22, 0.85))
-```
-
-```{r aap-table-1}
-yr_start <- 2045
-table_timeseries(ps1,
-                 type = "aap",
-                 yr_lim = c(yr_start, NA),
-                 scen = 1:2,
-                 decimals = 2,
-                 caption = "Average age in the population for the Unfished and Full attainment scenarios.")
-```
-
-```{r aap-table-2}
-yr_start <- 2045
-table_timeseries(ps1,
-                 type = "aap",
-                 yr_lim = c(yr_start, NA),
-                 scen = 3:4,
-                 decimals = 2,
-                 caption = "Average age in the population for the scenarios representing Full/Zero attainments for CAN/US.")
-```
-
-```{r aa-catch-country-attain, fig.cap = "Attainment scenarios average age in the true population by country."}
-yr_start <- 2010
-plot_timeseries(ps1,
-                type = "aap",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                by_country = TRUE,
-                facet_back_alpha = 50,
-                legend_position = c(0.08, 0.9))
-```
-
-```{r aap-bycountry-attain-table-1}
-yr_start <- 2045
-table_timeseries(ps1,
-                 type = "aap",
-                 yr_lim = c(yr_start, NA),
-                 scen = 1,
-                 decimals = 2,
-                 by_country = TRUE,
-                 caption = "Average age in the population by country for the unfished scenario.")
-```
-
-```{r aap-bycountry-attain-table-2}
-yr_start <- 2045
-table_timeseries(ps1,
-                 type = "aap",
-                 yr_lim = c(yr_start, NA),
-                 scen = 2,
-                 decimals = 2,
-                 by_country = TRUE,
-                 caption = "Average age in the population by country for the full attainment coastwide scenario.")
-```
-
-```{r aap-bycountry-attain-table-3}
-yr_start <- 2045
-table_timeseries(ps1,
-                 type = "aap",
-                 yr_lim = c(yr_start, NA),
-                 scen = 3,
-                 decimals = 2,
-                 by_country = TRUE,
-                 caption = "Average age in the population by country for the full attainment Canada, zero in the US scenario.")
-```
-
-```{r aap-bycountry-attain-table-4}
-yr_start <- 2045
-table_timeseries(ps1,
-                 type = "aap",
-                 yr_lim = c(yr_start, NA),
-                 scen = 4,
-                 decimals = 2,
-                 by_country = TRUE,
-                 caption = "Average age in the population by country for the full attainment US, zero in Canada scenario.")
-```
-
-```{r std-err-attain, fig.cap = "Attainment scenarios standard error of estimated to real spawning stock biomass."}
-plot_standard_error(ps1,
-                    facet_back_alpha = 50)
-```
-
-\clearpage 
-
-# Attainment scenarios with other attainment (Items 1 and 5-9)
-
-<!--
-```{r tacv-attain-other, fig.cap = "TAC / Vulnerable biomass by season and country."}
-plot_bars_country(ps2,
-                  facet_back_alpha = 50)
-```
--->
-
-```{r ssb-attain-other, fig.cap = "Attainment scenarios SSB in middle of the year."}
-yr_start <- 2010
-plot_timeseries(ps2,
+```{r zero-catch-recr-ssb, fig.cap = "SSB for OM-only case where catch is zero and recruitment is drawn from a lognormal distribution for the projected years."}
+plot_timeseries(ps_zero_catch_recr,
                 type = "ssb",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.25, 0.8)) #+
-  #coord_cartesian(xlim = c(2045, 2048), ylim = c(0, 1))
-  
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.18, 0.85))
 ```
 
-```{r ssb-attain-other-country, fig.cap = "Attainment scenarios SSB in middle of the year by country."}
-yr_start <- 2010
-plot_timeseries(ps2,
-                type = "ssb",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                by_country = TRUE,
-                show_40_10 = FALSE,
-                legend_position = c(0.08, 0.9))
-```
-
-```{r ssb-ssb0-attain-other, fig.cap = "Attainment scenarios relative spawning biomass."}
-plot_timeseries(ps2,
-                type = "ssb_ssb0",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.25, 0.80))
-```
-
-```{r catch-quota-attain-other, fig.cap = "Attainment scenarios catch / quota."}
-plot_timeseries(ps2,
-                type = "catch_quota",
-                ci_lines = TRUE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.25, 0.2))
-```
-
-```{r catch-quota-attain-other-table}
-yr_start <- 2019
-table_timeseries(ps2,
-                 type = "catch_quota",
-                 yr_lim = c(yr_start, NA),
-                 scen = 1:3,
-                 decimals = 3,
-                 caption = "Catch / quota for the Attainment scenarios.") %>% 
-    kableExtra::kable_styling(font_size = 9)
-```
-
-```{r pmetrics-attain-other, fig.cap = "Attainment scenarios violin plots of performace metrics."}
-plot_violins(ps2)
-```
-
-```{r pmetrics-attain-other-table}
-table_perf_metrics(ps2, 
-                   decimals = 3,
-                   scen = c(1, 3),
-                   caption = "Performance metrics for the Attainment scenarios.") %>% 
-      kableExtra::kable_styling(font_size = 7)
-```
-
-```{r exploitation-attain-other, fig.cap = "Attainment scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."}
-plot_violins_country(ps2, facet_back_alpha = 50)
-```
-
-```{r catch-attain-other, fig.cap = "Attainment scenarios future projections of catch."}
-#yr_start <- NA_real_
-yr_start <- 2010
-plot_timeseries(ps2,
+```{r zero-catch-recr-catch, fig.cap = "Catch for OM-only case where catch is zero and recruitment is drawn from a lognormal distribution for the projected years."}
+plot_timeseries(ps_zero_catch_recr,
                 type = "catch",
-                yr_lim = c(yr_start, NA),
-                ci_lines = FALSE,
-                legend_position = c(0.25, 0.80))
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.85, 0.85))
 ```
 
-```{r aa-catch-attain-other, fig.cap = "Attainment scenarios average age in catch."}
-plot_timeseries(ps2,
-                type = "aac",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                legend_position = c(0.25, 0.80))
+\clearpage
+
+## One million tonne annual catch, zero recruitment
+
+Figure \@ref(fig:million-catch-zero-recr-ssb) shows the spawning biomass for all attainment cases with one million tonnes annual catch set for all, and with zero recruitment for the projection years. Figure \@ref(fig:million-catch-zero-recr-catch) shows the catch for these scenarios. The Unfished scenario was described in earlier sections and is shown here again just for comparison.
+
+The scenario with full attainment for Canada and zero attainment for the U.S. starts off with full attainment catch (0.2612 million tonnes), which is seen as the short flat part from 2019--2020 in Figure \@ref(fig:million-catch-zero-recr-catch). This catch causes the SSB to dip below the $B_{40\%}$ line (Figure \@ref(fig:million-catch-zero-recr-ssb)) and the operating model applies the 40:10 adjustment which causes the catch rate to drop (2020--2023, Figure \@ref(fig:million-catch-zero-recr-catch)). The SSB climbs back up to $B_{40\%}$ at which point the catch increases just enough to keep the SSB at equilibrium at $B_{40\%}$.
+
+The scenarios with full coastwide catch and full U.S. catch with zero Canadian catch behave similarly to each other. The catch for these scenarios initially go to their full attainment values because the SSB is above $B_{40\%}$. These values are the full 1 million and 0.7388 million tonnes respectively. Just as with the full Canadian, zero U.S. attainment scenario, this initial catch drops the SSB below $B_{40\%}$. However, in these scenarios the drop is much more pronounced due to the high initial catches leaving the SSB at a very low level below $B_{10\%}$. Even at this level the catch and SSB come to an equilibrium, where catch and natural mortality is matching growth.
+
+The function call used to run the full attainment coastwide scenario is as follows.
+
+```{r eval = FALSE, echo = TRUE}
+run_oms(ss_model = ss_model,
+        n_runs = 100,
+        yr_future = 50,
+        fns = fns,
+        n_surveys = 2,
+        b_futures = 0,
+        c_increases = 0,
+        m_increases = 0,
+        sel_changes = 0,
+        catch_in = 1e6,
+        zero_catch_val = 0,
+        attain = c(1, 1),
+        upper_ref = 0.4,
+        f_ref = 0.4,
+        set_rec_devs_zero = TRUE,
+        plot_names = plotnames,
+        random_seed = 12345,
+        results_root_dir = results_root_dir,
+        results_dir = results_dir)
 ```
 
-```{r aa-catch-country-attain-other, fig.cap = "Attainment scenarios average age in catch by country."}
-plot_timeseries(ps2,
-                type = "aac",
-                ci_lines = FALSE,
-                yr_lim = c(yr_start, NA),
-                by_country = TRUE,
-                facet_back_alpha = 50,
-                legend_position = c(0.08, 0.9))
+```{r million-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch is 1 million tonnes and recruitment is zero."}
+plot_timeseries(ps_1e6_catch_zero_recr,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.18, 0.85))
 ```
 
-```{r aa-catch-bycountry-attain-other-table}
-yr_start <- 2040
-table_timeseries(ps2,
-                 type = "aac",
-                 yr_lim = c(yr_start, NA),
-                 scen = 1,
-                 decimals = 2,
-                 by_country = TRUE,
-                 caption = "Average age in the catch by country for the base Attainment scenario.")
+```{r million-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is zero."}
+plot_timeseries(ps_1e6_catch_zero_recr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.85, 0.85))
+```
+\clearpage
+
+<!-- ```{r million-catch-zero-recr-ssb-by-country, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is zero."} -->
+<!-- plot_timeseries(ps_1e6_catch_zero_recr, -->
+<!--                 type = "ssb", -->
+<!--                 by_country = TRUE, -->
+<!--                 show_40_10 = FALSE, -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(start_yr, NA), -->
+<!--                 legend_position = c(0.85, 0.85)) -->
+<!-- ``` -->
+
+## One million tonne annual catch, recruitment drawn from a lognormal distribution
+
+Figure \@ref(fig:million-catch-recr-ssb) shows the spawning biomass for all attainment cases with one million tonnes annual catch set for all, and with annual recruitment drawn from a lognormal distribution for the projection years. Figure \@ref(fig:million-catch-recr-catch) shows the catch for these scenarios. The Unfished scenario was described in earlier sections and is shown here again just for comparison.
+
+The scenario with full attainment for Canada and zero attainment for the U.S. (Figures \@ref(fig:million-catch-recr-ssb) and Figure \@ref(fig:million-catch-recr-catch)) behaves similarly to the scenario where there is zero recruitment (Figure \@ref(fig:million-catch-zero-recr-ssb)) for the 2019--2023 period. After 2023, the difference between that scenario and this one is that the addition of the recruitment allows the SSB to climb well above $B_{40\%}$. Once the SSB comes above $B_{40\%}$, the catch maxes out at 0.2612 million tonnes annually for Canada for the remainder of the projected years (Figure \@ref(fig:million-catch-recr-catch)).
+
+The scenario with full U.S. catch with zero Canadian catch initially goes to its full attainment value of 0.7388 million tonnes because the SSB is above $B_{40\%}$. The large catch applied drives the SSB below $B_{40\%}$ and the operating model applies the 40:10 adjustment to reduce catch (purple line, Figure \@ref(fig:million-catch-recr-catch)). Gradually the catch is increased, as the SSB increases until the SSB is above $B_{40\%}$ again, which takes place in approximately 2040. The full attainment of 0.7388 million tonnes is reached and continues annually.
+
+The scenario with full coastwide catch initially goes to its full attainment value of 1 million tonnes, and drops quickly due to the SSB dropping below $B_{40\%}$, just as in the scenario with full U.S. catch with zero Canadian catch. The catch in this scenario is also adjusted using the 40:10 adjustment, but is slower to come back above $B_{40\%}$. The full attainment in not reached again in the projected years, due to recruitment and growth not being large enough to support natural mortality and the large catches.
+
+The function call used to run the full attainment coastwide scenario is as follows.
+
+```{r eval = FALSE, echo = TRUE}
+run_oms(ss_model = ss_model,
+        n_runs = 100,
+        yr_future = 50,
+        fns = fns,
+        n_surveys = 2,
+        b_futures = 0,
+        c_increases = 0,
+        m_increases = 0,
+        sel_changes = 0,
+        catch_in = 1e6,
+        zero_catch_val = 0,
+        attain = c(1, 1),
+        upper_ref = 0.4,
+        f_ref = 0.4,
+        set_rec_devs_zero = FALSE,
+        plot_names = plotnames,
+        random_seed = 12345,
+        results_root_dir = results_root_dir,
+        results_dir = results_dir)
 ```
 
-```{r std-err-attain-other, fig.cap = "Attainment scenarios standard error of estimated to real spawning stock biomass."}
-plot_standard_error(ps2,
-                    facet_back_alpha = 50)
+```{r million-catch-recr-ssb, fig.cap = "SSB for OM-only case where catch is 1 million tonnes and recruitment is drawn from a lognormal distribution for the projected years."}
+plot_timeseries(ps_1e6_catch_recr,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.18, 0.85))
 ```
+
+```{r million-catch-recr-catch, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is drawn from a lognormal distribution for the projected years."}
+plot_timeseries(ps_1e6_catch_recr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.8, 0.5))
+```
+\clearpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- # Attainment scenarios with 0% and 100% attainment (Items 1-4) -->
+
+<!-- ```{r tacv-attain, fig.cap = "TAC / Vulnerable biomass by season and country."} -->
+<!-- plot_bars_country(ps1, -->
+<!--                   facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- ```{r ssb-attain, fig.cap = "Attainment scenarios SSB in middle of the year."} -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "ssb", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.22, 0.85)) -->
+<!-- ``` -->
+
+<!-- ```{r ssb-attain-country, fig.cap = "Attainment scenarios SSB in middle of the year by country."} -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "ssb", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 by_country = TRUE, -->
+<!--                 show_40_10 = FALSE, -->
+<!--                 legend_position = c(0.08, 0.9)) -->
+<!-- ``` -->
+
+<!-- ```{r ssb-ssb0-attain, fig.cap = "Attainment scenarios relative spawning biomass."} -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "ssb_ssb0", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.22, 0.85)) -->
+<!-- ``` -->
+
+<!-- ```{r catch-quota-attain, fig.cap = "Attainment scenarios catch / quota."} -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "catch_quota", -->
+<!--                 ci_lines = TRUE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.22, 0.15)) -->
+<!-- ``` -->
+
+<!-- <!-- -->
+<!-- ```{r catch-quota-attain-table} -->
+<!-- yr_start <- 2019 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "catch_quota", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 1:4, -->
+<!--                  decimals = 2, -->
+<!--                  caption = "Catch / quota for the Attainment scenarios.") %>%  -->
+<!--     kableExtra::kable_styling(font_size = 6) -->
+<!-- ``` -->
+
+<!-- ```{r pmetrics-attain, fig.cap = "Attainment scenarios violin plots of performace metrics."} -->
+<!-- plot_violins(ps1) -->
+<!-- ``` -->
+
+<!-- ```{r pmetrics-attain-table-1} -->
+<!-- table_perf_metrics(ps1,  -->
+<!--                    decimals = 3, -->
+<!--                    scen = 1:2, -->
+<!--                    caption = "Performance metrics for the Attainment scenarios.") %>%  -->
+<!--       kableExtra::kable_styling(font_size = 8) -->
+<!-- ``` -->
+
+<!-- ```{r pmetrics-attain-table-2} -->
+<!-- table_perf_metrics(ps1,  -->
+<!--                    decimals = 3, -->
+<!--                    scen = 3:4, -->
+<!--                    #scen_names = c("A", "B", "C", "D"), -->
+<!--                    caption = "Performance metrics for the Attainment scenarios.") %>%  -->
+<!--       kableExtra::kable_styling(font_size = 8) -->
+<!-- ``` -->
+
+<!-- ```{r exploitation-attain, fig.cap = "Attainment scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."} -->
+<!-- plot_violins_country(ps1, facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- ```{r catch-attain, fig.cap = "Attainment scenarios future projections of catch."} -->
+<!-- #yr_start <- NA_real_ -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "catch", -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 ci_lines = FALSE, -->
+<!--                 legend_position = c(0.22, 0.85)) -->
+<!-- ``` -->
+
+<!-- ```{r aa-catch-attain, fig.cap = "Attainment scenarios average age in the true population."} -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "aap", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.22, 0.85)) -->
+<!-- ``` -->
+
+<!-- ```{r aap-table-1} -->
+<!-- yr_start <- 2045 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "aap", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 1:2, -->
+<!--                  decimals = 2, -->
+<!--                  caption = "Average age in the population for the Unfished and Full attainment scenarios.") -->
+<!-- ``` -->
+
+<!-- ```{r aap-table-2} -->
+<!-- yr_start <- 2045 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "aap", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 3:4, -->
+<!--                  decimals = 2, -->
+<!--                  caption = "Average age in the population for the scenarios representing Full/Zero attainments for CAN/US.") -->
+<!-- ``` -->
+
+<!-- ```{r aa-catch-country-attain, fig.cap = "Attainment scenarios average age in the true population by country."} -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps1, -->
+<!--                 type = "aap", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 by_country = TRUE, -->
+<!--                 facet_back_alpha = 50, -->
+<!--                 legend_position = c(0.08, 0.9)) -->
+<!-- ``` -->
+
+<!-- ```{r aap-bycountry-attain-table-1} -->
+<!-- yr_start <- 2045 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "aap", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 1, -->
+<!--                  decimals = 2, -->
+<!--                  by_country = TRUE, -->
+<!--                  caption = "Average age in the population by country for the unfished scenario.") -->
+<!-- ``` -->
+
+<!-- ```{r aap-bycountry-attain-table-2} -->
+<!-- yr_start <- 2045 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "aap", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 2, -->
+<!--                  decimals = 2, -->
+<!--                  by_country = TRUE, -->
+<!--                  caption = "Average age in the population by country for the full attainment coastwide scenario.") -->
+<!-- ``` -->
+
+<!-- ```{r aap-bycountry-attain-table-3} -->
+<!-- yr_start <- 2045 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "aap", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 3, -->
+<!--                  decimals = 2, -->
+<!--                  by_country = TRUE, -->
+<!--                  caption = "Average age in the population by country for the full attainment Canada, zero in the US scenario.") -->
+<!-- ``` -->
+
+<!-- ```{r aap-bycountry-attain-table-4} -->
+<!-- yr_start <- 2045 -->
+<!-- table_timeseries(ps1, -->
+<!--                  type = "aap", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 4, -->
+<!--                  decimals = 2, -->
+<!--                  by_country = TRUE, -->
+<!--                  caption = "Average age in the population by country for the full attainment US, zero in Canada scenario.") -->
+<!-- ``` -->
+
+<!-- ```{r std-err-attain, fig.cap = "Attainment scenarios standard error of estimated to real spawning stock biomass."} -->
+<!-- plot_standard_error(ps1, -->
+<!--                     facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- \clearpage  -->
+
+<!-- # Attainment scenarios with other attainment (Items 1 and 5-9) -->
+
+<!-- <!-- -->
+<!-- ```{r tacv-attain-other, fig.cap = "TAC / Vulnerable biomass by season and country."} -->
+<!-- plot_bars_country(ps2, -->
+<!--                   facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- ```{r ssb-attain-other, fig.cap = "Attainment scenarios SSB in middle of the year."} -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "ssb", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.25, 0.8)) #+ -->
+<!--   #coord_cartesian(xlim = c(2045, 2048), ylim = c(0, 1)) -->
+
+<!-- ``` -->
+
+<!-- ```{r ssb-attain-other-country, fig.cap = "Attainment scenarios SSB in middle of the year by country."} -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "ssb", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 by_country = TRUE, -->
+<!--                 show_40_10 = FALSE, -->
+<!--                 legend_position = c(0.08, 0.9)) -->
+<!-- ``` -->
+
+<!-- ```{r ssb-ssb0-attain-other, fig.cap = "Attainment scenarios relative spawning biomass."} -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "ssb_ssb0", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.25, 0.80)) -->
+<!-- ``` -->
+
+<!-- ```{r catch-quota-attain-other, fig.cap = "Attainment scenarios catch / quota."} -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "catch_quota", -->
+<!--                 ci_lines = TRUE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.25, 0.2)) -->
+<!-- ``` -->
+
+<!-- ```{r catch-quota-attain-other-table} -->
+<!-- yr_start <- 2019 -->
+<!-- table_timeseries(ps2, -->
+<!--                  type = "catch_quota", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 1:3, -->
+<!--                  decimals = 3, -->
+<!--                  caption = "Catch / quota for the Attainment scenarios.") %>%  -->
+<!--     kableExtra::kable_styling(font_size = 9) -->
+<!-- ``` -->
+
+<!-- ```{r pmetrics-attain-other, fig.cap = "Attainment scenarios violin plots of performace metrics."} -->
+<!-- plot_violins(ps2) -->
+<!-- ``` -->
+
+<!-- ```{r pmetrics-attain-other-table} -->
+<!-- table_perf_metrics(ps2,  -->
+<!--                    decimals = 3, -->
+<!--                    scen = c(1, 3), -->
+<!--                    caption = "Performance metrics for the Attainment scenarios.") %>%  -->
+<!--       kableExtra::kable_styling(font_size = 7) -->
+<!-- ``` -->
+
+<!-- ```{r exploitation-attain-other, fig.cap = "Attainment scenarios violin plots of exploitation rates by country. The three violin plots represent spring, summer, and fall respectively."} -->
+<!-- plot_violins_country(ps2, facet_back_alpha = 50) -->
+<!-- ``` -->
+
+<!-- ```{r catch-attain-other, fig.cap = "Attainment scenarios future projections of catch."} -->
+<!-- #yr_start <- NA_real_ -->
+<!-- yr_start <- start_yr -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "catch", -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 ci_lines = FALSE, -->
+<!--                 legend_position = c(0.25, 0.80)) -->
+<!-- ``` -->
+
+<!-- ```{r aa-catch-attain-other, fig.cap = "Attainment scenarios average age in catch."} -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "aac", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 legend_position = c(0.25, 0.80)) -->
+<!-- ``` -->
+
+<!-- ```{r aa-catch-country-attain-other, fig.cap = "Attainment scenarios average age in catch by country."} -->
+<!-- plot_timeseries(ps2, -->
+<!--                 type = "aac", -->
+<!--                 ci_lines = FALSE, -->
+<!--                 yr_lim = c(yr_start, NA), -->
+<!--                 by_country = TRUE, -->
+<!--                 facet_back_alpha = 50, -->
+<!--                 legend_position = c(0.08, 0.9)) -->
+<!-- ``` -->
+
+<!-- ```{r aa-catch-bycountry-attain-other-table} -->
+<!-- yr_start <- 2040 -->
+<!-- table_timeseries(ps2, -->
+<!--                  type = "aac", -->
+<!--                  yr_lim = c(yr_start, NA), -->
+<!--                  scen = 1, -->
+<!--                  decimals = 2, -->
+<!--                  by_country = TRUE, -->
+<!--                  caption = "Average age in the catch by country for the base Attainment scenario.") -->
+<!-- ``` -->
+
+<!-- ```{r std-err-attain-other, fig.cap = "Attainment scenarios standard error of estimated to real spawning stock biomass."} -->
+<!-- plot_standard_error(ps2, -->
+<!--                     facet_back_alpha = 50) -->
+<!-- ``` -->
 

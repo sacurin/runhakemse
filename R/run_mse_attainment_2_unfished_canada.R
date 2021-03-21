@@ -11,13 +11,14 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-#fns <- "04_us_100_can_0"
-fns <- "05_us_100_can_0_5050TAC"
+fns <- "MSE_02_us_100_can_0"
 
-plotnames <- "Full attainment US, no CAN fishery, 50/50 TAC"
+plotnames <- "Full attainment US, no CAN fishery, 0.4 ref"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
+# When doing zero attainment coastwide, we must use 0.02 instead of 0 because the EM will crash the stock.
+# Below 0.006, the minimizer will begin to give NaNs in the objective function for various years.
 attains <- list(c(0, 1))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
@@ -44,18 +45,20 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
          overwrite_ss_rds = FALSE,
-         n_runs = 15,
+         n_runs = 2,
          n_sim_yrs = 30,
+         f_space = c(0.2612, 0.7388),
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
          attains = attains,
-         f_space = c(0.5, 0.5),
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
          catch_floor = 180000,
+         upper_ref = 0.4,
+         f_ref = 0.4,
          save_all_em = TRUE,
          verbose = FALSE)

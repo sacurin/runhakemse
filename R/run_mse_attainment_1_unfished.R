@@ -11,7 +11,7 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-fns <- "01_us_0_can_0"
+fns <- "MSE_01_us_0_can_0"
 
 plotnames <- "Unfished baseline"
 
