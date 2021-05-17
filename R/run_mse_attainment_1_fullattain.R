@@ -3,7 +3,7 @@ load_all("../pacifichakemse")
 library(here)
 
 results_root_dir <- here("results")
-results_dir <- file.path(results_root_dir, "attainment")
+results_dir <- file.path(results_root_dir, "mse_attainment99")
 
 ss_model_yr <- 2018
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
@@ -11,9 +11,9 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-fns <- "MSE_01_us_100_can_100"
+fns <- "01_us_100_can_100"
 
-plotnames <- "Full attainment coastwide, 0.4 ref"
+plotnames <- "Full attainment coastwide"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
@@ -45,20 +45,22 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
          overwrite_ss_rds = FALSE,
-         n_runs = 2,
+         n_runs = 20,
          n_sim_yrs = 30,
          f_space = c(0.2612, 0.7388),
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
          attains = attains,
+         hcr_lower = 0.1,
+         hcr_upper = 0.4,
+         hcr_fspr = 0.4, # Turn off the F_spr part of the HCR by setting this to zero
+         random_seed = 99,
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
          catch_floor = 180000,
-         upper_ref = 0.4,
-         f_ref = 0.4,
          save_all_em = TRUE,
          verbose = FALSE)

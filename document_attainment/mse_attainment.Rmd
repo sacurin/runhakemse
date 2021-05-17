@@ -1,5 +1,5 @@
 ---
-title: "Pacific hake MSE attainment"
+title: "Pacific hake MSE HCR and attainments"
 date: "March, 2021"
 output: 
   bookdown::pdf_document2:
@@ -60,33 +60,72 @@ knit_hooks$set(inline = function(x){
 theme_set(hake_theme())
 
 overwrite_rds <- FALSE
-ps_zero_catch_zero_recr <- load_mse_plot_data(scenario = "attainment_zero_catch_zero_recr",
-                                              om_only = TRUE,
-                                              overwrite_rds = overwrite_rds,
-                                              short_term_yrs = 2018:2027,
-                                              long_term_yrs = 2027,
-                                              main_results_dir = "results")
+short_term_yrs <- 2018:2027
+long_term_yrs <- 2027
+main_results_dir <- "results"
 
-ps_zero_catch_recr <- load_mse_plot_data(scenario = "attainment_zero_catch_recr",
-                                         om_only = TRUE,
-                                         overwrite_rds = overwrite_rds,
-                                         short_term_yrs = 2018:2027,
-                                         long_term_yrs = 2027,
-                                         main_results_dir = "results")
+# 500,000 t catch, without recruitment and without HCR applied
+ps_5e5_catch_norecr_nohcr <- load_mse_plot_data(
+  scenario = "attainment_5e5_catch_norecr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
 
-ps_1e6_catch_zero_recr <- load_mse_plot_data(scenario = "attainment_1e6_catch_zero_recr",
-                                             om_only = TRUE,
-                                             overwrite_rds = overwrite_rds,
-                                             short_term_yrs = 2018:2027,
-                                             long_term_yrs = 2027,
-                                             main_results_dir = "results")
+# 1,000,000 t catch, without recruitment and without HCR applied
+ps_1e6_catch_norecr_nohcr <- load_mse_plot_data(
+  scenario = "attainment_1e6_catch_norecr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
 
-ps_1e6_catch_recr <- load_mse_plot_data(scenario = "attainment_1e6_catch_recr",
-                                        om_only = TRUE,
-                                        overwrite_rds = overwrite_rds,
-                                        short_term_yrs = 2018:2027,
-                                        long_term_yrs = 2027,
-                                        main_results_dir = "results")
+# 500,000 t catch, with recruitment and with HCR applied
+ps_5e5_catch_recr_hcr <- load_mse_plot_data(
+  scenario = "attainment_5e5_catch_recr_hcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
+
+# 500,000 t catch, with recruitment and without HCR applied
+ps_5e5_catch_recr_nohcr <- load_mse_plot_data(
+  scenario = "attainment_5e5_catch_recr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
+
+# No catch, without recruitment and without HCR applied
+ps_unfished_norecr_nohcr <- load_mse_plot_data(
+  scenario = "unfished_norecr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
+
+# No catch, without recruitment and without HCR applied
+ps_unfished_norecr_hcr <- load_mse_plot_data(
+  scenario = "unfished_norecr_hcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
+
+# No catch, with recruitment and without HCR applied
+ps_unfished_recr_nohcr <- load_mse_plot_data(
+  scenario = "unfished_recr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
 
 ci_lines <- TRUE
 start_yr <- 2008
@@ -95,15 +134,15 @@ start_yr <- 2008
 
 # Operating model runs without Estimation model
 
-## Zero catch and zero recruitment
+## Zero catch, no recruitment, no HCR applied
 
-The spawning biomass in Figure \@ref(fig:zero-catch-zero-recr-ssb) shows that all attainment cases overlap because there is zero catch set for all, which overrides any attainment values. The catch can be seen to drop immediately to zero in 2019 in Figure \@ref(fig:zero-catch-zero-recr-catch). This is shown as a test of the code to make sure catch is indeed zero in all cases. There is also zero recruitment so all runs have the same values and there are no confidence intervals (i.e. no random recruitment) in the spawning biomass plot. The increase here in the projection period (2019--2069) is attributed to growth only. In this case, the biomass never drops below the $B_{40\%}$ reference point, so the 40:10 adjustment is not evident.
+The spawning biomass in Figure \@ref(fig:zero-catch-zero-recr-ssb) shows that lack of catch allows the stock to climb to long-term equilibrium. The catch (Figure \@ref(fig:zero-catch-zero-recr-catch)) is shown for confirmation that the code is correct when set to zero catch. There is no random recruitment in this run so there are no confidence intervals on the spawning biomass plot. The increase here in the projection period (2019--2069) is attributed to growth only.
 
-The function call used to run the full attainment coastwide scenario is as follows. The $attain$ argument is changed for other scenarios to values between zero and one for attainment proportions for Canada followed by the U.S.
+The function call used to run the full attainment coastwide scenario is as follows. The $attain$ argument would be changed for other scenarios to values between zero and one for attainment proportions for Canada and the U.S.
 
 ```{r eval = FALSE, echo = TRUE}
 run_oms(ss_model = ss_model,
-        n_runs = 100,
+        n_runs = 1,
         yr_future = 50,
         fns = fns,
         n_surveys = 2,
@@ -112,10 +151,12 @@ run_oms(ss_model = ss_model,
         m_increases = 0,
         sel_changes = 0,
         catch_in = 0,
-        zero_catch_val = 0,
-        attain = c(1, 1),
-        upper_ref = 0.4,
-        f_ref = 0.4,
+        attain = c(1, 1), # proportion of TAC attained by country in this order: c(Canada, US)
+        tac = c(0, 1),
+        hcr_apply = FALSE,
+        hcr_lower = 0.1,
+        hcr_upper = 0.4,
+        hcr_fspr = 0.4,
         set_rec_devs_zero = TRUE,
         plot_names = plotnames,
         random_seed = 12345,
@@ -123,16 +164,16 @@ run_oms(ss_model = ss_model,
         results_dir = results_dir)
 ```
 
-```{r zero-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch and recruitment are zero for the projected years."}
-plot_timeseries(ps_zero_catch_zero_recr,
+```{r zero-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch and recruitment are zero for the projected years with no HCR applied."}
+plot_timeseries(ps_unfished_norecr_nohcr,
                 type = "ssb",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
                 legend_position = c(0.18, 0.85))
 ```
 
-```{r zero-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch and recruitment are zero for the projected years."}
-plot_timeseries(ps_zero_catch_zero_recr,
+```{r zero-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch and recruitment are zero for the projected years with no HCR applied."}
+plot_timeseries(ps_unfished_norecr_nohcr,
                 type = "catch",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
@@ -140,9 +181,56 @@ plot_timeseries(ps_zero_catch_zero_recr,
 ```
 \clearpage
 
-## Zero catch, recruitment drawn from a lognormal distribution
+## Default catch, no recruitment, HCR applied ($F_{SPR_{40\%}}$ with a 40:10 adjustment)
 
-Figure \@ref(fig:zero-catch-recr-ssb) shows the spawning biomass for all attainment cases with zero catch set for all, and with annual recruitment drawn from a lognormal distribution fort the projection years. The same seed is used for all scenarios, so all the values overlap exactly and the resulting plot looks like only one scenario is present. The 95% confidence interval shows that the random recruitments introduce uncertainty in the biomass output in the projection years. The catch plot (Figure \@ref(fig:zero-catch-recr-catch)) is identical to Figure \@ref(fig:zero-catch-zero-recr-catch) because there are still zero catches in all cases. It is shown here as a simple check.
+Figures \@ref(fig:zero-catch-zero-recr-hcr-ssb) and \@ref(fig:zero-catch-zero-recr-hcr-catch) show the effects of the application of the HCR on the default catch. The spawning biomass is above $B_{40\%}$ at the start of the projection period, so maximum catch based on $F_{SPR_{40\%}}$ is allocated for the first year. That catch drops the biomass below $B_{40\%}$ and the 40:10 adjustment reduces the catch according to it's value below $B_{40\%}$. In the full attainment and Canada-only catch scenarios equilibrium is reached quite quickly. The equilibrium SSB remains below $B_{40\%}$ because there is no recruitment. The US-only catch scenario is oscillating between low and higher catches, and would also eventually come to equilibrium.
+
+The function call used to run the full attainment coastwide scenario is as follows. Note **catch_in** is commented out so that default catch will be used.
+
+```{r eval = FALSE, echo = TRUE}
+run_oms(ss_model = ss_model,
+        n_runs = 1,
+        yr_future = 50,
+        fns = fns,
+        n_surveys = 2,
+        b_futures = 0,
+        c_increases = 0,
+        m_increases = 0,
+        sel_changes = 0,
+        #catch_in = 0,
+        attain = c(1, 1),
+        tac = c(0, 1),
+        hcr_apply = TRUE,
+        hcr_lower = 0.1,
+        hcr_upper = 0.4,
+        hcr_fspr = 0.4,
+        set_rec_devs_zero = TRUE,
+        plot_names = plotnames,
+        random_seed = 12345,
+        results_root_dir = results_root_dir,
+        results_dir = results_dir)
+```
+
+```{r zero-catch-zero-recr-hcr-ssb, fig.cap = "SSB for OM-only case where catch and recruitment are zero for the projected years with the HCR applied."}
+plot_timeseries(ps_unfished_norecr_hcr,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.18, 0.85))
+```
+
+```{r zero-catch-zero-recr-hcr-catch, fig.cap = "Catch for OM-only case where catch and recruitment are zero for the projected years with the HCR applied."}
+plot_timeseries(ps_unfished_norecr_hcr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                legend_position = c(0.85, 0.85))
+```
+\clearpage
+
+## Zero catch, recruitment drawn from a lognormal distribution, no HCR applied
+
+Figure \@ref(fig:zero-catch-recr-ssb) shows the spawning biomass for the zero catch case, and with annual recruitment drawn from a lognormal distribution for the projection years. The catch plot is not shown here because it is identical to Figure \@ref(fig:zero-catch-recr-catch)) is identical to Figure \@ref(fig:zero-catch-zero-recr-catch).
 
 The function call used to run the full attainment coastwide scenario is as follows.
 
@@ -157,10 +245,12 @@ run_oms(ss_model = ss_model,
         m_increases = 0,
         sel_changes = 0,
         catch_in = 0,
-        zero_catch_val = 0,
         attain = c(1, 1),
-        upper_ref = 0.4,
-        f_ref = 0.4,
+        tac = c(0, 1),
+        hcr_apply = FALSE,
+        hcr_lower = 0.1,
+        hcr_upper = 0.4,
+        hcr_fspr = 0.4,
         set_rec_devs_zero = FALSE,
         plot_names = plotnames,
         random_seed = 12345,
@@ -168,29 +258,22 @@ run_oms(ss_model = ss_model,
         results_dir = results_dir)
 ```
 
-```{r zero-catch-recr-ssb, fig.cap = "SSB for OM-only case where catch is zero and recruitment is drawn from a lognormal distribution for the projected years."}
-plot_timeseries(ps_zero_catch_recr,
+```{r zero-catch-recr-ssb, fig.cap = "SSB for OM-only case where catch is zero and recruitment is drawn from a lognormal distribution for the projected years and no HCR applied."}
+plot_timeseries(ps_unfished_recr_nohcr,
                 type = "ssb",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
                 legend_position = c(0.18, 0.85))
 ```
 
-```{r zero-catch-recr-catch, fig.cap = "Catch for OM-only case where catch is zero and recruitment is drawn from a lognormal distribution for the projected years."}
-plot_timeseries(ps_zero_catch_recr,
-                type = "catch",
-                ci_lines = ci_lines,
-                yr_lim = c(start_yr, NA),
-                legend_position = c(0.85, 0.85))
-```
-
 \clearpage
 
-## One million tonne annual catch, zero recruitment
 
-Figure \@ref(fig:million-catch-zero-recr-ssb) shows the spawning biomass for all attainment cases with one million tonnes annual catch set for all, and with zero recruitment for the projection years. Figure \@ref(fig:million-catch-zero-recr-catch) shows the catch for these scenarios. The Unfished scenario was described in earlier sections and is shown here again just for comparison.
+## 500,000 tonne annual catch, zero recruitment, no HCR applied
 
-The scenario with full attainment for Canada and zero attainment for the U.S. starts off with full attainment catch (0.2612 million tonnes), which is seen as the short flat part from 2019--2020 in Figure \@ref(fig:million-catch-zero-recr-catch). This catch causes the SSB to dip below the $B_{40\%}$ line (Figure \@ref(fig:million-catch-zero-recr-ssb)) and the operating model applies the 40:10 adjustment which causes the catch rate to drop (2020--2023, Figure \@ref(fig:million-catch-zero-recr-catch)). The SSB climbs back up to $B_{40\%}$ at which point the catch increases just enough to keep the SSB at equilibrium at $B_{40\%}$.
+Figure \@ref(fig:half-million-catch-zero-recr-ssb) shows the spawning biomass for all attainment cases with 500,000 tonnes annual catch set for all, and with zero recruitment for the projection years. Figure \@ref(fig:half-million-catch-zero-recr-catch) shows the catch for these scenarios.
+
+The scenario with full attainment for Canada and zero attainment for the U.S. starts off with full attainment catch (0.1306 million tonnes), which is seen as the short flat part from 2019--2020 in Figure \@ref(fig:half-million-catch-zero-recr-catch). This catch causes the SSB to dip below the $B_{40\%}$ line (Figure \@ref(fig:half-million-catch-zero-recr-ssb)) and the operating model applies the 40:10 adjustment which causes the catch rate to drop (2020--2023, Figure \@ref(fig:half-million-catch-zero-recr-catch)). The SSB climbs back up to $B_{40\%}$ at which point the catch increases just enough to keep the SSB at equilibrium at $B_{40\%}$.
 
 The scenarios with full coastwide catch and full U.S. catch with zero Canadian catch behave similarly to each other. The catch for these scenarios initially go to their full attainment values because the SSB is above $B_{40\%}$. These values are the full 1 million and 0.7388 million tonnes respectively. Just as with the full Canadian, zero U.S. attainment scenario, this initial catch drops the SSB below $B_{40\%}$. However, in these scenarios the drop is much more pronounced due to the high initial catches leaving the SSB at a very low level below $B_{10\%}$. Even at this level the catch and SSB come to an equilibrium, where catch and natural mortality is matching growth.
 
@@ -206,11 +289,13 @@ run_oms(ss_model = ss_model,
         c_increases = 0,
         m_increases = 0,
         sel_changes = 0,
-        catch_in = 1e6,
-        zero_catch_val = 0,
+        catch_in = 5e5,
         attain = c(1, 1),
-        upper_ref = 0.4,
-        f_ref = 0.4,
+        tac = c(0, 1),
+        hcr_apply = FALSE,
+        hcr_lower = 0.1,
+        hcr_upper = 0.4,
+        hcr_fspr = 0.4,
         set_rec_devs_zero = TRUE,
         plot_names = plotnames,
         random_seed = 12345,
@@ -218,16 +303,16 @@ run_oms(ss_model = ss_model,
         results_dir = results_dir)
 ```
 
-```{r million-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch is 1 million tonnes and recruitment is zero."}
-plot_timeseries(ps_1e6_catch_zero_recr,
+```{r half-million-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch is 500,000 tonnes and recruitment is zero."}
+plot_timeseries(ps_5e5_catch_norecr_nohcr,
                 type = "ssb",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
                 legend_position = c(0.18, 0.85))
 ```
 
-```{r million-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is zero."}
-plot_timeseries(ps_1e6_catch_zero_recr,
+```{r half-million-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch is 500,000 tonnes and recruitment is zero."}
+plot_timeseries(ps_5e5_catch_norecr_nohcr,
                 type = "catch",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
@@ -235,25 +320,13 @@ plot_timeseries(ps_1e6_catch_zero_recr,
 ```
 \clearpage
 
-<!-- ```{r million-catch-zero-recr-ssb-by-country, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is zero."} -->
-<!-- plot_timeseries(ps_1e6_catch_zero_recr, -->
-<!--                 type = "ssb", -->
-<!--                 by_country = TRUE, -->
-<!--                 show_40_10 = FALSE, -->
-<!--                 ci_lines = FALSE, -->
-<!--                 yr_lim = c(start_yr, NA), -->
-<!--                 legend_position = c(0.85, 0.85)) -->
-<!-- ``` -->
+## 1,000,000 tonne annual catch, zero recruitment, no HCR applied
 
-## One million tonne annual catch, recruitment drawn from a lognormal distribution
+Figure \@ref(fig:million-catch-zero-recr-ssb) shows the spawning biomass for all attainment cases with 500,000 tonnes annual catch set for all, and with zero recruitment for the projection years. Figure \@ref(fig:million-catch-zero-recr-catch) shows the catch for these scenarios.
 
-Figure \@ref(fig:million-catch-recr-ssb) shows the spawning biomass for all attainment cases with one million tonnes annual catch set for all, and with annual recruitment drawn from a lognormal distribution for the projection years. Figure \@ref(fig:million-catch-recr-catch) shows the catch for these scenarios. The Unfished scenario was described in earlier sections and is shown here again just for comparison.
+The scenario with full attainment for Canada and zero attainment for the U.S. starts off with full attainment catch (0.1306 million tonnes), which is seen as the short flat part from 2019--2020 in Figure \@ref(fig:million-catch-zero-recr-catch). This catch causes the SSB to dip below the $B_{40\%}$ line (Figure \@ref(fig:million-catch-zero-recr-ssb)) and the operating model applies the 40:10 adjustment which causes the catch rate to drop (2020--2023, Figure \@ref(fig:million-catch-zero-recr-catch)). The SSB climbs back up to $B_{40\%}$ at which point the catch increases just enough to keep the SSB at equilibrium at $B_{40\%}$.
 
-The scenario with full attainment for Canada and zero attainment for the U.S. (Figures \@ref(fig:million-catch-recr-ssb) and Figure \@ref(fig:million-catch-recr-catch)) behaves similarly to the scenario where there is zero recruitment (Figure \@ref(fig:million-catch-zero-recr-ssb)) for the 2019--2023 period. After 2023, the difference between that scenario and this one is that the addition of the recruitment allows the SSB to climb well above $B_{40\%}$. Once the SSB comes above $B_{40\%}$, the catch maxes out at 0.2612 million tonnes annually for Canada for the remainder of the projected years (Figure \@ref(fig:million-catch-recr-catch)).
-
-The scenario with full U.S. catch with zero Canadian catch initially goes to its full attainment value of 0.7388 million tonnes because the SSB is above $B_{40\%}$. The large catch applied drives the SSB below $B_{40\%}$ and the operating model applies the 40:10 adjustment to reduce catch (purple line, Figure \@ref(fig:million-catch-recr-catch)). Gradually the catch is increased, as the SSB increases until the SSB is above $B_{40\%}$ again, which takes place in approximately 2040. The full attainment of 0.7388 million tonnes is reached and continues annually.
-
-The scenario with full coastwide catch initially goes to its full attainment value of 1 million tonnes, and drops quickly due to the SSB dropping below $B_{40\%}$, just as in the scenario with full U.S. catch with zero Canadian catch. The catch in this scenario is also adjusted using the 40:10 adjustment, but is slower to come back above $B_{40\%}$. The full attainment in not reached again in the projected years, due to recruitment and growth not being large enough to support natural mortality and the large catches.
+The scenarios with full coastwide catch and full U.S. catch with zero Canadian catch behave similarly to each other. The catch for these scenarios initially go to their full attainment values because the SSB is above $B_{40\%}$. These values are the full 1 million and 0.7388 million tonnes respectively. Just as with the full Canadian, zero U.S. attainment scenario, this initial catch drops the SSB below $B_{40\%}$. However, in these scenarios the drop is much more pronounced due to the high initial catches leaving the SSB at a very low level below $B_{10\%}$. Even at this level the catch and SSB come to an equilibrium, where catch and natural mortality is matching growth.
 
 The function call used to run the full attainment coastwide scenario is as follows.
 
@@ -267,34 +340,97 @@ run_oms(ss_model = ss_model,
         c_increases = 0,
         m_increases = 0,
         sel_changes = 0,
-        catch_in = 1e6,
-        zero_catch_val = 0,
+        catch_in = 5e5,
         attain = c(1, 1),
-        upper_ref = 0.4,
-        f_ref = 0.4,
-        set_rec_devs_zero = FALSE,
+        tac = c(0, 1),
+        hcr_apply = FALSE,
+        hcr_lower = 0.1,
+        hcr_upper = 0.4,
+        hcr_fspr = 0.4,
+        set_rec_devs_zero = TRUE,
         plot_names = plotnames,
         random_seed = 12345,
         results_root_dir = results_root_dir,
         results_dir = results_dir)
 ```
 
-```{r million-catch-recr-ssb, fig.cap = "SSB for OM-only case where catch is 1 million tonnes and recruitment is drawn from a lognormal distribution for the projected years."}
-plot_timeseries(ps_1e6_catch_recr,
+```{r million-catch-zero-recr-ssb, fig.cap = "SSB for OM-only case where catch is 500,000 tonnes and recruitment is zero."}
+plot_timeseries(ps_1e6_catch_norecr_nohcr,
                 type = "ssb",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
                 legend_position = c(0.18, 0.85))
 ```
 
-```{r million-catch-recr-catch, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is drawn from a lognormal distribution for the projected years."}
-plot_timeseries(ps_1e6_catch_recr,
+```{r million-catch-zero-recr-catch, fig.cap = "Catch for OM-only case where catch is 500,000 tonnes and recruitment is zero."}
+plot_timeseries(ps_1e6_catch_norecr_nohcr,
                 type = "catch",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
-                legend_position = c(0.8, 0.5))
+                legend_position = c(0.85, 0.85))
 ```
 \clearpage
+
+<!-- <!-- ```{r million-catch-zero-recr-ssb-by-country, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is zero."} -->
+<!-- <!-- plot_timeseries(ps_1e6_catch_zero_recr, -->
+<!-- <!--                 type = "ssb", -->
+<!-- <!--                 by_country = TRUE, -->
+<!-- <!--                 show_40_10 = FALSE, -->
+<!-- <!--                 ci_lines = FALSE, -->
+<!-- <!--                 yr_lim = c(start_yr, NA), -->
+<!-- <!--                 legend_position = c(0.85, 0.85)) -->
+<!-- <!-- ``` -->
+
+<!-- ## One million tonne annual catch, recruitment drawn from a lognormal distribution -->
+
+<!-- Figure \@ref(fig:million-catch-recr-ssb) shows the spawning biomass for all attainment cases with one million tonnes annual catch set for all, and with annual recruitment drawn from a lognormal distribution for the projection years. Figure \@ref(fig:million-catch-recr-catch) shows the catch for these scenarios. The Unfished scenario was described in earlier sections and is shown here again just for comparison. -->
+
+<!-- The scenario with full attainment for Canada and zero attainment for the U.S. (Figures \@ref(fig:million-catch-recr-ssb) and Figure \@ref(fig:million-catch-recr-catch)) behaves similarly to the scenario where there is zero recruitment (Figure \@ref(fig:million-catch-zero-recr-ssb)) for the 2019--2023 period. After 2023, the difference between that scenario and this one is that the addition of the recruitment allows the SSB to climb well above $B_{40\%}$. Once the SSB comes above $B_{40\%}$, the catch maxes out at 0.2612 million tonnes annually for Canada for the remainder of the projected years (Figure \@ref(fig:million-catch-recr-catch)). -->
+
+<!-- The scenario with full U.S. catch with zero Canadian catch initially goes to its full attainment value of 0.7388 million tonnes because the SSB is above $B_{40\%}$. The large catch applied drives the SSB below $B_{40\%}$ and the operating model applies the 40:10 adjustment to reduce catch (purple line, Figure \@ref(fig:million-catch-recr-catch)). Gradually the catch is increased, as the SSB increases until the SSB is above $B_{40\%}$ again, which takes place in approximately 2040. The full attainment of 0.7388 million tonnes is reached and continues annually. -->
+
+<!-- The scenario with full coastwide catch initially goes to its full attainment value of 1 million tonnes, and drops quickly due to the SSB dropping below $B_{40\%}$, just as in the scenario with full U.S. catch with zero Canadian catch. The catch in this scenario is also adjusted using the 40:10 adjustment, but is slower to come back above $B_{40\%}$. The full attainment in not reached again in the projected years, due to recruitment and growth not being large enough to support natural mortality and the large catches. -->
+
+<!-- The function call used to run the full attainment coastwide scenario is as follows. -->
+
+<!-- ```{r eval = FALSE, echo = TRUE} -->
+<!-- run_oms(ss_model = ss_model, -->
+<!--         n_runs = 100, -->
+<!--         yr_future = 50, -->
+<!--         fns = fns, -->
+<!--         n_surveys = 2, -->
+<!--         b_futures = 0, -->
+<!--         c_increases = 0, -->
+<!--         m_increases = 0, -->
+<!--         sel_changes = 0, -->
+<!--         catch_in = 1e6, -->
+<!--         zero_catch_val = 0, -->
+<!--         attain = c(1, 1), -->
+<!--         upper_ref = 0.4, -->
+<!--         f_ref = 0.4, -->
+<!--         set_rec_devs_zero = FALSE, -->
+<!--         plot_names = plotnames, -->
+<!--         random_seed = 12345, -->
+<!--         results_root_dir = results_root_dir, -->
+<!--         results_dir = results_dir) -->
+<!-- ``` -->
+
+<!-- ```{r million-catch-recr-ssb, fig.cap = "SSB for OM-only case where catch is 1 million tonnes and recruitment is drawn from a lognormal distribution for the projected years."} -->
+<!-- plot_timeseries(ps_1e6_catch_recr, -->
+<!--                 type = "ssb", -->
+<!--                 ci_lines = ci_lines, -->
+<!--                 yr_lim = c(start_yr, NA), -->
+<!--                 legend_position = c(0.18, 0.85)) -->
+<!-- ``` -->
+
+<!-- ```{r million-catch-recr-catch, fig.cap = "Catch for OM-only case where catch is 1 million tonnes and recruitment is drawn from a lognormal distribution for the projected years."} -->
+<!-- plot_timeseries(ps_1e6_catch_recr, -->
+<!--                 type = "catch", -->
+<!--                 ci_lines = ci_lines, -->
+<!--                 yr_lim = c(start_yr, NA), -->
+<!--                 legend_position = c(0.8, 0.5)) -->
+<!-- ``` -->
+<!-- \clearpage -->
 
 
 

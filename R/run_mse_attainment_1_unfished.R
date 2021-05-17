@@ -3,7 +3,7 @@ load_all("../pacifichakemse")
 library(here)
 
 results_root_dir <- here("results")
-results_dir <- file.path(results_root_dir, "attainment")
+results_dir <- file.path(results_root_dir, "mse_attainment99")
 
 ss_model_yr <- 2018
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
@@ -11,7 +11,7 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-fns <- "MSE_01_us_0_can_0"
+fns <- "00_us_0_can_0"
 
 plotnames <- "Unfished baseline"
 
@@ -45,12 +45,16 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
          overwrite_ss_rds = FALSE,
-         n_runs = 2,
+         n_runs = 20,
          n_sim_yrs = 30,
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
          attains = attains,
+         hcr_lower = 0.1,
+         hcr_upper = 0.4,
+         hcr_fspr = 0.4, # Turn off the F_spr part of the HCR by setting this to zero
+         random_seed = 99,
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
