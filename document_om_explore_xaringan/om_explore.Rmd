@@ -1,8 +1,8 @@
 ---
-title: "Hake MSE Exploration of OM"
-subtitle: "Compare recruitment and reference points"
-author: "Chris"
-institute: "Brainstorming"
+title: "Hake MSE Exploration of Operating model"
+subtitle: "Compare HCR with and without recruitment"
+author: ""
+institute: ""
 date: "Slides compiled on `r Sys.Date()`"
 output:
   xaringan::moon_reader:
@@ -15,6 +15,10 @@ output:
 header-includes:
   - \usepackage{animate}
 ---
+
+background-image: url(mse_attainment.png)
+background-size: contain
+
 
 ```{r setup, include=FALSE, echo=FALSE, fig.width=8, fig.height=8}
 # paste this into the console before running `xaringan::inf_mr("twg_01.Rmd")`
@@ -67,39 +71,6 @@ short_term_yrs <- 2018:2027
 long_term_yrs <- 2027
 main_results_dir <- "results"
 
-# No catch, no recruitment and no HCR applied
-if(!exists("ps_attainment_norecr_hcr")){
-  ps_attainment_norecr_hcr <- load_mse_plot_data(
-    scenario = "om_attainment_norecr_hcr",
-    om_only = TRUE,
-    overwrite_rds = overwrite_rds,
-    short_term_yrs = short_term_yrs,
-    long_term_yrs = long_term_yrs,
-    main_results_dir = main_results_dir)
-}
-
-# 1,000,000 t catch, no recruitment and no HCR applied
-if(!exists("ps_1e6_catch_norecr_nohcr")){
-ps_1e6_catch_norecr_nohcr <- load_mse_plot_data(
-  scenario = "om_attainment_1e6_catch_norecr_nohcr",
-  om_only = TRUE,
-  overwrite_rds = overwrite_rds,
-  short_term_yrs = short_term_yrs,
-  long_term_yrs = long_term_yrs,
-  main_results_dir = main_results_dir)
-}
-
-# 1,000,000 t catch, recruitment and HCR applied
-if(!exists("ps_recr_hcr")){
-ps_recr_hcr <- load_mse_plot_data(
-  scenario = "om_attainment_recr_hcr",
-  om_only = TRUE,
-  overwrite_rds = overwrite_rds,
-  short_term_yrs = short_term_yrs,
-  long_term_yrs = long_term_yrs,
-  main_results_dir = main_results_dir)
-}
-
 ci_lines <- TRUE
 start_yr <- 2008
 
@@ -123,8 +94,19 @@ class: center, middle, inverse
 
 ---
 class: center
-### No recruitment, default catch, default HCR
+### No recruitment, default catch, 0.4/0.1 $B_0$ HCR
 ```{r zero-catch-zero-recr-hcr-ssb, out.width = 450}
+# No catch, no recruitment and no HCR applied
+if(!exists("ps_attainment_norecr_hcr")){
+  ps_attainment_norecr_hcr <- load_mse_plot_data(
+    scenario = "om_attainment_norecr_hcr",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
 plot_timeseries(ps_attainment_norecr_hcr,
                 type = "ssb",
                 ci_lines = ci_lines,
@@ -143,8 +125,145 @@ plot_timeseries(ps_attainment_norecr_hcr,
 
 ---
 class: center
-### Recruitment, default catch, default HCR
+### No recruitment, default catch, 0.4/0.1 $B_0$ HCR
+```{r zero-recr-hcr-catchlimited-ssb, out.width = 450}
+# No catch, no recruitment and no HCR applied
+if(!exists("ps_attainment_norecr_hcr_catchlimited")){
+  ps_attainment_norecr_hcr_catchlimited <- load_mse_plot_data(
+    scenario = "om_attainment_norecr_hcr_2019_catchlimited",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_attainment_norecr_hcr_catchlimited,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.18, 0.85)) + 
+  annotate(geom = "text", x = 2050, y = 2, label = "catch capped at 300,000", color = "red", size = 9)
+```
+```{r zero-recr-hcr-catchlimited-catch, out.width = 450}
+plot_timeseries(ps_attainment_norecr_hcr_catchlimited,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85))
+```
+
+---
+class: center
+### No recruitment, default catch 2.4/2.1 $B_0$ HCR
+```{r zero-catch-zero-recr-hcr-ref2-ssb, out.width = 450}
+# No catch, no recruitment and no HCR applied
+if(!exists("ps_attainment_norecr_hcr_ref2")){
+  ps_attainment_norecr_hcr_ref2 <- load_mse_plot_data(
+    scenario = "om_attainment_norecr_hcr_ref2",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_attainment_norecr_hcr_ref2,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 3),
+                legend_position = c(0.18, 0.85))
+```
+```{r zero-catch-zero-recr-hcr-ref2-catch, out.width = 450}
+plot_timeseries(ps_attainment_norecr_hcr_ref2,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85))
+```
+
+---
+class: center
+### No recruitment, default catch, 1.8/1.2 $B_0$ HCR
+```{r zero-catch-zero-recr-hcr-ref3-ssb, out.width = 450}
+# No catch, no recruitment and no HCR applied
+if(!exists("ps_attainment_norecr_hcr_ref3")){
+  ps_attainment_norecr_hcr_ref3 <- load_mse_plot_data(
+    scenario = "om_attainment_norecr_hcr_ref3",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_attainment_norecr_hcr_ref3,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 3),
+                legend_position = c(0.18, 0.85))
+```
+```{r zero-catch-zero-recr-hcr-ref3-catch, out.width = 450}
+plot_timeseries(ps_attainment_norecr_hcr_ref3,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85))
+```
+
+---
+class: center
+### No recruitment, default catch, 1.8/1.2 $B_0$ HCR
+```{r zero-catch-zero-recr-hcr-ref3-altcalc-ssb, out.width = 450}
+# No catch, no recruitment and no HCR applied
+if(!exists("ps_attainment_norecr_hcr_ref3_altcalc")){
+  ps_attainment_norecr_hcr_ref3_altcalc <- load_mse_plot_data(
+    scenario = "om_attainment_norecr_hcr_ref3_altcalc",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_attainment_norecr_hcr_ref3_altcalc,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 3),
+                legend_position = c(0.18, 0.85)) + 
+  annotate(geom = "text", x = 2055, y = 2.85, label = "Nis' code", color = "red", size = 12)
+```
+```{r zero-catch-zero-recr-hcr-ref3-altcalc-catch, out.width = 450}
+plot_timeseries(ps_attainment_norecr_hcr_ref3_altcalc,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85))
+```
+
+---
+class: center
+### Recruitment, default catch, 0.4/0.1 $B_0$ HCR
 ```{r recr-hcr-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr")){
+  ps_recr_hcr <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
 plot_timeseries(ps_recr_hcr,
                 type = "ssb",
                 ci_lines = ci_lines,
@@ -163,8 +282,113 @@ plot_timeseries(ps_recr_hcr,
 
 ---
 class: center
+### Recruitment, default catch, 2.4/2.1 $B_0$ HCR
+```{r recr-hcr-ref2-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_ref2")){
+  ps_recr_hcr_ref2 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_ref2",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_ref2,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-ref2-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_ref2,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Recruitment, default catch, 2.4/2.1 $B_0$ HCR
+```{r recr-hcr-ref2-altcalc-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_ref2_altcalc")){
+  ps_recr_hcr_ref2_altcalc <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_ref2_altcalc",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_ref2_altcalc,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85)) + 
+  annotate(geom = "text", x = 2015, y = 2.85, label = "Nis' code", color = "red", size = 12)
+```
+```{r recr-hcr-ref2-altcalc-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_ref2_altcalc,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Recruitment, default catch, 1.8/1.2 $B_0$ HCR
+```{r recr-hcr-ref3-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_ref3")){
+  ps_recr_hcr_ref3 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_ref3",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_ref3,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-ref3-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_ref3,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
 ### No recruitment, 1e6 t catch, no HCR
 ```{r zero-recr-zero-hcr-ssb, out.width = 450}
+# 1,000,000 t catch, no recruitment and no HCR applied
+if(!exists("ps_1e6_catch_norecr_nohcr")){
+ps_1e6_catch_norecr_nohcr <- load_mse_plot_data(
+  scenario = "om_attainment_1e6_catch_norecr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
+}
+
 plot_timeseries(ps_1e6_catch_norecr_nohcr,
                 type = "ssb",
                 ci_lines = ci_lines,
@@ -174,6 +398,135 @@ plot_timeseries(ps_1e6_catch_norecr_nohcr,
 ```
 ```{r zero-recr-zero-hcr-catch, out.width = 450}
 plot_timeseries(ps_1e6_catch_norecr_nohcr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Recruitment, 1e6 t catch, no HCR
+```{r recr-zero-hcr-ssb, out.width = 450}
+# 1,000,000 t catch, no recruitment and no HCR applied
+if(!exists("ps_1e6_catch_recr_nohcr")){
+ps_1e6_catch_recr_nohcr <- load_mse_plot_data(
+  scenario = "om_attainment_1e6_catch_recr_nohcr",
+  om_only = TRUE,
+  overwrite_rds = overwrite_rds,
+  short_term_yrs = short_term_yrs,
+  long_term_yrs = long_term_yrs,
+  main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_1e6_catch_recr_nohcr,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-zero-hcr-catch, out.width = 450}
+plot_timeseries(ps_1e6_catch_recr_nohcr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center, middle, inverse
+
+# Different random seeds for recruitment
+
+---
+class: center
+### Seed 12345, default catch, 0.4/0.1 $B_0$ HCR
+```{r recr-hcr-ssb-2, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr")){
+  ps_recr_hcr <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-catch-2, out.width = 450}
+plot_timeseries(ps_recr_hcr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Seed 42, default catch, 0.4/0.1 $B_0$ HCR
+```{r recr-hcr-ssb-seed42, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_seed42")){
+  ps_recr_hcr_seed42 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_rand_42",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_seed42,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-catch-seed42, out.width = 450}
+plot_timeseries(ps_recr_hcr_seed42,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Seed 999, default catch, 0.4/0.1 $B_0$ HCR
+```{r recr-hcr-ssb-seed999, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_seed999")){
+  ps_recr_hcr_seed999 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_rand_999",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_seed999,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-catch-seed999, out.width = 450}
+plot_timeseries(ps_recr_hcr_seed999,
                 type = "catch",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
