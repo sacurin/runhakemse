@@ -17,8 +17,6 @@ plotnames <- "74% total catch, 48% US, 26% CAN"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
-# When doing zero attainment coastwide, we must use 0.02 instead of 0 because the EM will crash the stock.
-# Below 0.006, the minimizer will begin to give NaNs in the objective function for various years.
 attains <- list(c(1, 0.6465))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.

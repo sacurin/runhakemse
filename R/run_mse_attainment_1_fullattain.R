@@ -17,8 +17,6 @@ plotnames <- "Full attainment coastwide"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
-# When doing zero attainment coastwide, we must use 0.02 instead of 0 because the EM will crash the stock.
-# Below 0.006, the minimizer will begin to give NaNs in the objective function for various years.
 attains <- list(c(1, 1))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
@@ -46,7 +44,7 @@ run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
          overwrite_ss_rds = TRUE,
-         n_runs = 10,
+         n_runs = 100,
          n_sim_yrs = 30,
          fns = fns,
          plot_names = plotnames,
