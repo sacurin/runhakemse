@@ -114,6 +114,7 @@ plot_timeseries(ps_attainment_norecr_hcr,
                 ylim = c(0, NA),
                 legend_position = c(0.18, 0.85))
 ```
+
 ```{r zero-catch-zero-recr-hcr-catch, out.width = 450}
 plot_timeseries(ps_attainment_norecr_hcr,
                 type = "catch",
@@ -121,6 +122,19 @@ plot_timeseries(ps_attainment_norecr_hcr,
                 yr_lim = c(start_yr, NA),
                 ylim = c(0, NA),
                 legend_position = c(0.85, 0.85))
+```
+
+---
+class: center
+### AAP No recruitment, default catch, 0.4/0.1 $B_0$ HCR
+```{r zero-catch-zero-recr-hcr-aap}
+plot_timeseries(ps_attainment_norecr_hcr,
+                type = "aap",
+                by_country = T,
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.18, 0.85))
 ```
 
 ---
@@ -269,10 +283,49 @@ plot_timeseries(ps_recr_hcr,
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
                 ylim = c(0, 5),
-                legend_position = c(0.18, 0.85))
+                legend_position = c(0.18, 0.85)) #+
+  # theme(legend.key.size = unit(1, 'cm'), #change legend key size
+  #       legend.key.height = unit(1, 'cm'), #change legend key height
+  #       legend.key.width = unit(1, 'cm'), #change legend key width
+  #       legend.title = element_text(size=14), #change legend title font size
+  #       legend.text = element_text(size=10))
+  #       
+  #aspect_ratio <- 2.5       
+  #ggsave("attain4010.png", device = "png", height = 7 , width = 7 * aspect_ratio)
 ```
 ```{r recr-hcr-catch, out.width = 450}
 plot_timeseries(ps_recr_hcr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Recruitment, default catch, 0.4/0.1 $B_0$ HCR
+```{r recr-hcr-f60-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_f60")){
+  ps_recr_hcr_f60 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_f60",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_f60,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-f60-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_f60,
                 type = "catch",
                 ci_lines = ci_lines,
                 yr_lim = c(start_yr, NA),
@@ -310,6 +363,100 @@ plot_timeseries(ps_recr_hcr_ref2,
                 ylim = c(0, 2),
                 legend_position = c(0.18, 0.85))
 ```
+
+---
+class: center
+### Recruitment, default catch, 2.4/2.1 $B_0$ HCR seed 101
+```{r recr-hcr-ref2-seed101-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_ref2_seed101")){
+  ps_recr_hcr_ref2_seed101 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_ref2_seed101",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_ref2_seed101,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-ref2-seed101-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_ref2_seed101,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Recruitment, default catch, 2.4/2.1 B0 HCR, FSPR60
+```{r recr-hcr-ref2-f60-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_ref2_f60")){
+  ps_recr_hcr_ref2_f60 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_ref2_f60",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_ref2_f60,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-ref2-f60-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_ref2_f60,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
+---
+class: center
+### Recruitment, default catch, 2.4/2.1 B0 HCR, FSPR90
+```{r recr-hcr-ref2-f90-ssb, out.width = 450}
+# 1,000,000 t catch, recruitment and HCR applied
+if(!exists("ps_recr_hcr_ref2_f90")){
+  ps_recr_hcr_ref2_f90 <- load_mse_plot_data(
+    scenario = "om_attainment_recr_hcr_ref2_f90",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_recr_hcr_ref2_f90,
+                type = "ssb",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 5),
+                legend_position = c(0.18, 0.85))
+```
+```{r recr-hcr-ref2-f90-catch, out.width = 450}
+plot_timeseries(ps_recr_hcr_ref2_f90,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, 2),
+                legend_position = c(0.18, 0.85))
+```
+
 
 ---
 class: center

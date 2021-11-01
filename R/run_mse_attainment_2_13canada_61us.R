@@ -3,7 +3,7 @@ load_all("../pacifichakemse")
 library(here)
 
 results_root_dir <- here("results")
-results_dir <- file.path(results_root_dir, "attainment")
+results_dir <- file.path(results_root_dir, "mse_attainment99")
 
 ss_model_yr <- 2018
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
@@ -11,19 +11,15 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-fns <- c("07_us_60_can_56",
-         "08_us_77_can_70",
-         "09_us_77_can_90")
+fns <- "04_us_61_can_13"
 
-plotnames <- c("US low attainment (60%), 56% CAN",
-               "CAN high attainment (70%), 77% US",
-               "CAN highest attainment (90%), 77% US")
+plotnames <- "74% total catch, 61% US, 13% CAN"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
-attains <- list(c(0.56, 0.6),
-                c(0.7, 0.77),
-                c(0.9, 0.77))
+# When doing zero attainment coastwide, we must use 0.02 instead of 0 because the EM will crash the stock.
+# Below 0.006, the minimizer will begin to give NaNs in the objective function for various years.
+attains <- list(c(0.5, 0.8232))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
@@ -31,9 +27,7 @@ attains <- list(c(0.56, 0.6),
 # c_new * 0.5 unless below catch_floor in which case it will be c_new = catch_floor.
 # To apply no TAC, use c(0, 1).
 # In any event, if the calculation is greater than c_new, c_new will be used instead
-tacs <- list(c(0, 1),
-             c(0, 1),
-             c(0, 1))
+tacs <- list(c(0, 1))
 
 # A vector with one element for each scenario, which is additional proportion of the stock to be
 # moved from space 2 to space 1 (into Canada). If a single value instead of a vector, that value
@@ -50,18 +44,27 @@ sel_changes <- 0
 run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
-         overwrite_ss_rds = FALSE,
-         n_runs = 30,
+         overwrite_ss_rds = TRUE,
+         n_runs = 10,
          n_sim_yrs = 30,
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
          attains = attains,
+         hcr_lower = 0.1,
+         hcr_upper = 0.4,
+         # Turn off the F_spr part of the HCR by setting this to zero
+         hcr_fspr = 0.4,
+         # Seed for generating all the individual run seeds
+         random_seed = 12345,
+         # Use this as a seed to run a single run. Uses the first file fns[1] only (for debugging seeds that fail)
+         #single_seed = 166372,
+         f_space = c(0.2612, 0.7388),
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
          catch_floor = 180000,
-         save_all_em = TRUE,
+         save_all_em = FALSE,
          verbose = FALSE)

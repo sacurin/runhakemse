@@ -3,7 +3,7 @@ load_all("../pacifichakemse")
 library(here)
 
 results_root_dir <- here("results")
-results_dir <- file.path(results_root_dir, "mse_selectivity")
+results_dir <- file.path(results_root_dir, "mse_attainment99")
 
 ss_model_yr <- 2018
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
@@ -11,19 +11,15 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-fns <- c("01_sel1",
-         "02_sel2",
-         "03_sel3")
+fns <- "05_us_48_can_26"
 
-plotnames <- c("Base scenario",
-               "US small \nselectivity",
-               paste0(ss_model_yr, " selectivity"))
+plotnames <- "74% total catch, 48% US, 26% CAN"
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
-attains <- list(c(1, 1),
-                c(1, 1),
-                c(1, 1))
+# When doing zero attainment coastwide, we must use 0.02 instead of 0 because the EM will crash the stock.
+# Below 0.006, the minimizer will begin to give NaNs in the objective function for various years.
+attains <- list(c(1, 0.6465))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
@@ -31,9 +27,7 @@ attains <- list(c(1, 1),
 # c_new * 0.5 unless below catch_floor in which case it will be c_new = catch_floor.
 # To apply no TAC, use c(0, 1).
 # In any event, if the calculation is greater than c_new, c_new will be used instead
-tacs <- list(c(139482.707564733, 0.378286338688197), # JMC values (see run_MSE_HCR.R)
-             c(139482.707564733, 0.378286338688197),
-             c(139482.707564733, 0.378286338688197))
+tacs <- list(c(0, 1))
 
 # A vector with one element for each scenario, which is additional proportion of the stock to be
 # moved from space 2 to space 1 (into Canada). If a single value instead of a vector, that value
@@ -45,7 +39,7 @@ movein_increases <- 0
 moveout_decreases <- 0
 
 # A vector with one element for each scenario, or a single value to use for all scenarios
-sel_changes <- c(0, 1, 2)
+sel_changes <- 0
 
 run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,

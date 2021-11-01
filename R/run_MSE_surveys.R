@@ -3,7 +3,7 @@ load_all("../pacifichakemse")
 library(here)
 
 results_root_dir <- here("results")
-results_dir <- file.path(results_root_dir, "surveys")
+results_dir <- file.path(results_root_dir, "mse_surveys")
 
 ss_model_yr <- 2018
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
@@ -11,13 +11,19 @@ ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWor
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                    "extdata", "csv-data")
 
-fns <- c("MSE_Real_Survey1",
-         "MSE_Real_Survey2",
-         "MSE_Real_Survey3")
+fns <- c("real_survey1",
+         "real_survey2",
+         "real_survey3")
 
-plotnames <- c("Survey1",
-               "Base scenario",
-               "Survey3")
+plotnames <- c("Survey every year",
+               "Survey every 2 years",
+               "Survey every 3 years")
+
+# List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
+# For each vector of two e.g. c(a, b): a is the Canadian attainment proportion, b is the US attainment proportion
+attains <- list(c(1, 1),
+                c(1, 1),
+                c(1, 1))
 
 # List of vectors (of two) of the same length as the number of scenarios, one vector for each scenario.
 # For each vector of two e.g. c(a, b): the new catch in the OM is c_new * b + a
@@ -44,16 +50,28 @@ sel_changes <- 0
 run_mses(ss_model_output_dir = ss_model_output_dir,
          ss_model_data_csv_dir = ss_model_data_csv_dir,
          load_extra_mcmc = FALSE,
-         overwrite_ss_rds = FALSE,
-         n_runs = 1,
-         n_sim_yrs = 5,
+         overwrite_ss_rds = TRUE,
+         n_runs = 10,
          n_surveys = 1:3,
+         n_sim_yrs = 30,
          fns = fns,
          plot_names = plotnames,
          tacs = tacs,
+         attains = attains,
+         hcr_lower = 0.1,
+         hcr_upper = 0.4,
+         # Turn off the F_spr part of the HCR by setting this to zero
+         hcr_fspr = 0.4,
+         # Seed for generating all the individual run seeds
+         random_seed = 12345,
+         # Use this as a seed to run a single run. Uses the first file fns[1] only (for debugging seeds that fail)
+         #single_seed = 166372,
+         f_space = c(0.2612, 0.7388),
          c_increases = movein_increases,
          m_increases = moveout_decreases,
          sel_changes = sel_changes,
          results_root_dir = results_root_dir,
          results_dir = results_dir,
+         catch_floor = 180000,
+         save_all_em = FALSE,
          verbose = FALSE)
