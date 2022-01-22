@@ -1,0 +1,108 @@
+---
+title: "Pacific hake MSE HCR and attainments"
+date: "March, 2021"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    fig_caption: yes
+    includes:
+      in_header: header.tex
+urlcolor: blue
+---
+
+```{r setup-r-env, include = FALSE}
+library(devtools)
+library(gridExtra)
+library(here)
+library(knitr)
+load_all("../../pacifichakemse")
+#library(pacifichakemse)
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+# Make all inline numeric values have comma separator for thousands
+knit_hooks$set(inline = function(x){
+  if(!is.numeric(x)){
+    x
+  }else{
+    prettyNum(x, big.mark = ",")
+  }
+})
+
+theme_set(hake_theme())
+
+overwrite_rds <- FALSE
+short_term_yrs <- 2018:2027
+long_term_yrs <- 2027
+main_results_dir <- "results"
+
+ci_lines <- TRUE
+start_yr <- 2008
+
+if(!exists("clim_rec")){
+  ps_attainment_norecr_hcr <- load_mse_plot_data(
+    scenario = "01_MSErun_move_JMC_climate_00_JMC",
+    om_only = FALSE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+}
+
+plot_timeseries(ps_attainment_norecr_hcr,
+                type = "ssb",
+                time="beg",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.18, 0.85))
+
+```
+```{r zero-catch-zero-recr-hcr-catch, out.width = 450}
+plot_timeseries(ps_attainment_norecr_hcr,
+                type = "catch",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85))
+```
+
+### AAP No recruitment, default catch, 0.4/0.1 $B_0$ HCR
+```{r zero-catch-zero-recr-hcr-aap}
+plot_timeseries(ps_attainment_norecr_hcr,
+                type = "aap",
+                by_country = T,
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.18, 0.85))
+```
+
