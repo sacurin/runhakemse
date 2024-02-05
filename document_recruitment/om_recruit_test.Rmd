@@ -1,0 +1,128 @@
+---
+title: "Pacific hake MSE OM recruitment testing"
+date: "January, 2024"
+output: 
+  bookdown::pdf_document2:
+    toc: false
+    fig_caption: yes
+    includes:
+      in_header: 
+urlcolor: blue
+---
+
+```{r setup-r-env, include = FALSE}
+library(devtools)
+library(gridExtra)
+library(here)
+library(knitr)
+library(ggplot2)
+#library(tinytex)
+load_all("../../pacifichakemse")
+#library(pacifichakemse)
+
+knitr_figs_dir <- "knitr-figs-pdf/"
+knitr_cache_dir <- "knitr-cache-pdf/"
+fig_out_type <- "pdf"
+fig_asp <- 0.618
+fig_width <- 9
+fig_out_width <- "6in"
+fig_dpi <- 180
+fig_align <- "center"
+fig_pos <- "htb"
+opts_chunk$set(
+  fig.pos = "!H",
+  out.extra = "",
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  comment = "#>",
+  fig.path = knitr_figs_dir,
+  cache.path = knitr_cache_dir,
+  fig.asp = fig_asp,
+  fig.width = fig_width,
+  out.width = fig_out_width,
+  echo = FALSE,
+  #  autodep = TRUE,
+  #  cache = TRUE,
+  cache.comments = FALSE,
+  dev = fig_out_type,
+  dpi = fig_dpi,
+  fig.align = fig_align,
+  fig.pos = fig_pos)
+
+# Make all inline numeric values have comma separator for thousands
+knit_hooks$set(inline = function(x){
+  if(!is.numeric(x)){
+    x
+  }else{
+    prettyNum(x, big.mark = ",")
+  }
+})
+
+theme_set(hake_theme())
+
+overwrite_rds <- FALSE
+short_term_yrs <- 2018:2027
+long_term_yrs <- 2027
+main_results_dir <- "results"
+
+ci_lines <- TRUE
+start_yr <- 2008
+
+
+fns <- "sqrec"
+
+plotnames <- "Area rec"
+
+
+  om_sq_rec <- load_mse_plot_data(
+    scenario = "recruitment",
+    om_only = TRUE,
+    overwrite_rds = overwrite_rds,
+    short_term_yrs = short_term_yrs,
+    long_term_yrs = long_term_yrs,
+    main_results_dir = main_results_dir)
+```
+```{r zero-catch-zero-recr-ssb}
+plot_timeseries(om_sq_rec,
+                type = "ssb",
+                time="beg",
+                by_country = T,
+                
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.18, 0.85),
+                show_hcr = F,
+                show_hcr_values = F)
+
+```
+```{r zero-catch-zero-recr-hcr-ssb0, out.width = 450}
+plot_timeseries(om_sq_rec,
+                type = "ssb_ssb0",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85),
+                show_hcr = F,
+                show_hcr_values = F)
+```
+
+```{r zero-catch-zero-recr-hcr-catch}
+plot_timeseries(om_sq_rec,
+                type = "aas",
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.85, 0.85))
+```
+### AAP No recruitment, default catch, 0.4/0.1 $B_0$ HCR
+```{r zero-catch-zero-recr-aap}
+plot_timeseries(om_sq_rec,
+                type = "aap",
+                by_country = T,
+                ci_lines = ci_lines,
+                yr_lim = c(start_yr, NA),
+                ylim = c(0, NA),
+                legend_position = c(0.18, 0.85))
+```
+
