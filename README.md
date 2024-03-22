@@ -4,10 +4,15 @@
 
 To get started, clone or download this repository and the [pacifichakemse package](https://github.com/pacific-hake/pacifichakemse) which contains the functions necessary for running the MSE and plotting the results. These two repositories must be in the same parent directory for the code in the scripts found in this project to work out-of-the-box.
 
-You must build and install the package so that the SS model and data files are installed to your `R/library/pacifichakemse` directory. This is done in RStudio by opening the `pacifichakemse.Rproj` file (found in the `pacifichakemse` package) and pressing `Ctrl-Shift-b`, or by running the following code:
+You must build and install the package so that the Stock Synthesis model and data files are installed to your `R/library/pacifichakemse` directory. This is done in RStudio by opening the `pacifichakemse.Rproj` file (found in the `pacifichakemse` package) and pressing `Ctrl-Shift-b`, or by running the following code:
 
 ``` r
 devtools::install_github("https://github.com/pacific-hake/pacifichakemse")
+
+# If you are installing from a local clone (1) navigate your working directory
+# to the pacifichakemse clone and (2) run the 2nd line, both lines for Windows
+# withr::local_options(pkg.build_extra_flags = FALSE)
+# devtools::load_all()
 ```
 
 ## Loading the SS model output
