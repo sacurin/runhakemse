@@ -1,11 +1,12 @@
-#library(pacifichakemse)
-load_all("../pacifichakemse")
+library(devtools)
+library(pacifichakemse)
 library(here)
+load_all("../pacifichakemse")
 
 results_root_dir <- here("results")
 results_dir <- file.path(results_root_dir, "mse_hcr")
 
-ss_model_yr <- 2018
+ss_model_yr <- 2022
 ss_model_output_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
                                  "extdata", paste0("SS3_", ss_model_yr))
 ss_model_data_csv_dir <- file.path(system.file(package = "pacifichakemse", mustWork = TRUE),
